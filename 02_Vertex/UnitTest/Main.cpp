@@ -2,9 +2,13 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "VertexLine.h"
+#include "VertexLine2.h"
+
 void Main::Initialize()
 {
-
+	//Push(new VertexLine());
+	Push(new VertexLine2());
 }
 
 void Main::Ready()
