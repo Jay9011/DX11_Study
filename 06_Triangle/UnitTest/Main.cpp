@@ -2,13 +2,15 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
-#include "VertexLine.h"
+#include "TriangleList.h"
 #include "VertexLine2.h"
+#include "VertexLine.h"
 
 void Main::Initialize()
 {
+	Push(new TriangleList());
+	//Push(new VertexLine2());
 	//Push(new VertexLine());
-	Push(new VertexLine2());
 }
 
 void Main::Ready()

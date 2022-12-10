@@ -9,6 +9,9 @@
     <ClCompile Include="VertexLine2.cpp">
       <Filter>Vertex</Filter>
     </ClCompile>
+    <ClCompile Include="TriangleList.cpp">
+      <Filter>Vertex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -17,6 +20,9 @@
       <Filter>Vertex</Filter>
     </ClInclude>
     <ClInclude Include="VertexLine2.h">
+      <Filter>Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleList.h">
       <Filter>Vertex</Filter>
     </ClInclude>
   </ItemGroup>

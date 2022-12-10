@@ -174,12 +174,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TriangleList.cpp" />
     <ClCompile Include="VertexLine.cpp" />
     <ClCompile Include="VertexLine2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TriangleList.h" />
     <ClInclude Include="VertexLine.h" />
     <ClInclude Include="VertexLine2.h" />
   </ItemGroup>
