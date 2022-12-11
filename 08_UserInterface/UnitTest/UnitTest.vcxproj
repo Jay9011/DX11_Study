@@ -179,6 +179,7 @@
     <ClCompile Include="UserInterfaceDemo.cpp" />
     <ClCompile Include="VertexLine.cpp" />
     <ClCompile Include="VertexLine2.cpp" />
+    <ClCompile Include="WorldDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -188,6 +189,7 @@
     <ClInclude Include="UserInterfaceDemo.h" />
     <ClInclude Include="VertexLine.h" />
     <ClInclude Include="VertexLine2.h" />
+    <ClInclude Include="WorldDemo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

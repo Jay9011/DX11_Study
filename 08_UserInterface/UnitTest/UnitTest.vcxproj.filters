@@ -18,6 +18,9 @@
     <ClCompile Include="UserInterfaceDemo.cpp">
       <Filter>Vertex</Filter>
     </ClCompile>
+    <ClCompile Include="WorldDemo.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -37,10 +40,16 @@
     <ClInclude Include="UserInterfaceDemo.h">
       <Filter>Vertex</Filter>
     </ClInclude>
+    <ClInclude Include="WorldDemo.h">
+      <Filter>World</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Vertex">
       <UniqueIdentifier>{4374e51c-fbc2-4aa3-9ca0-58475e56a21d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="World">
+      <UniqueIdentifier>{39277bad-44b2-467c-b0e2-02dbff32f73e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

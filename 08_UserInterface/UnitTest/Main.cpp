@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "WorldDemo.h"
 #include "UserInterfaceDemo.h"
 #include "RectDemo.h"
 #include "TriangleList.h"
@@ -10,7 +11,8 @@
 
 void Main::Initialize()
 {
-	Push(new UserInterfaceDemo());
+	Push(new WorldDemo());
+	//Push(new UserInterfaceDemo());
 	//Push(new RectDemo());
 	//Push(new TriangleList());
 	//Push(new VertexLine2());
