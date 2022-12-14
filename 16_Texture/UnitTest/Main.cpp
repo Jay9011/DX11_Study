@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "TextureDemo.h"
 #include "RotationDemo.h"
 #include "CubeDemo.h"
 #include "GridDemo.h"
@@ -17,7 +18,8 @@
 
 void Main::Initialize()
 {
-	Push(new RotationDemo());
+	Push(new TextureDemo());
+	//Push(new RotationDemo());
 	//Push(new CubeDemo());
 	//Push(new GridDemo());
 	//Push(new IndexDemo());

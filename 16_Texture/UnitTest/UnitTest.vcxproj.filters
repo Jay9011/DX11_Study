@@ -39,6 +39,9 @@
     <ClCompile Include="RotationDemo.cpp">
       <Filter>World</Filter>
     </ClCompile>
+    <ClCompile Include="TextureDemo.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -77,6 +80,9 @@
       <Filter>Mesh</Filter>
     </ClInclude>
     <ClInclude Include="RotationDemo.h">
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureDemo.h">
       <Filter>World</Filter>
     </ClInclude>
   </ItemGroup>
