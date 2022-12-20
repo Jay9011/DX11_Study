@@ -59,11 +59,9 @@
     <ClCompile Include="Viewer\Camera.cpp">
       <Filter>Viewer</Filter>
     </ClCompile>
-    <ClCompile Include="Viewer\Freedom.cpp" />
     <ClCompile Include="Environment\Terrain.cpp">
       <Filter>Environment</Filter>
     </ClCompile>
-    <ClCompile Include="Renders\DebugLine.cpp" />
     <ClCompile Include="Meshes\Mesh.cpp">
       <Filter>Meshes</Filter>
     </ClCompile>
@@ -75,6 +73,18 @@
     </ClCompile>
     <ClCompile Include="Meshes\MeshGrid.cpp">
       <Filter>Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Meshes\MeshSphere.cpp">
+      <Filter>Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Meshes\MeshCylinder.cpp">
+      <Filter>Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewer\Freedom.cpp">
+      <Filter>Viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renders\DebugLine.cpp">
+      <Filter>Renders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -162,7 +172,6 @@
     <ClInclude Include="Viewer\Camera.h">
       <Filter>Viewer</Filter>
     </ClInclude>
-    <ClInclude Include="Viewer\Freedom.h" />
     <ClInclude Include="Environment\Terrain.h">
       <Filter>Environment</Filter>
     </ClInclude>
@@ -178,6 +187,15 @@
     </ClInclude>
     <ClInclude Include="Meshes\MeshGrid.h">
       <Filter>Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Meshes\MeshSphere.h">
+      <Filter>Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Meshes\MeshCylinder.h">
+      <Filter>Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewer\Freedom.h">
+      <Filter>Viewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
