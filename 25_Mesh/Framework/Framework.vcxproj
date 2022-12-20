@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="Environment\Terrain.cpp" />
     <ClCompile Include="Meshes\Mesh.cpp" />
+    <ClCompile Include="Meshes\MeshCube.cpp" />
+    <ClCompile Include="Meshes\MeshGrid.cpp" />
     <ClCompile Include="Meshes\MeshQuad.cpp" />
     <ClCompile Include="Renders\DebugLine.cpp" />
     <ClCompile Include="Viewer\Camera.cpp" />
@@ -53,6 +55,8 @@
   <ItemGroup>
     <ClInclude Include="Environment\Terrain.h" />
     <ClInclude Include="Meshes\Mesh.h" />
+    <ClInclude Include="Meshes\MeshCube.h" />
+    <ClInclude Include="Meshes\MeshGrid.h" />
     <ClInclude Include="Meshes\MeshQuad.h" />
     <ClInclude Include="Renders\DebugLine.h" />
     <ClInclude Include="Viewer\Camera.h" />

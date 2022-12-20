@@ -70,6 +70,12 @@
     <ClCompile Include="Meshes\MeshQuad.cpp">
       <Filter>Meshes</Filter>
     </ClCompile>
+    <ClCompile Include="Meshes\MeshCube.cpp">
+      <Filter>Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Meshes\MeshGrid.cpp">
+      <Filter>Meshes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Renders">
@@ -165,6 +171,12 @@
       <Filter>Meshes</Filter>
     </ClInclude>
     <ClInclude Include="Meshes\MeshQuad.h">
+      <Filter>Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Meshes\MeshCube.h">
+      <Filter>Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Meshes\MeshGrid.h">
       <Filter>Meshes</Filter>
     </ClInclude>
   </ItemGroup>
