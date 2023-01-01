@@ -48,7 +48,7 @@ VertexBuffer::~VertexBuffer()
 void VertexBuffer::Render()
 {
     UINT offset = 0;
-    D3D::GetDC()->IAGetVertexBuffers(slot, 1, &buffer, &stride, &offset);
+    D3D::GetDC()->IASetVertexBuffers(slot, 1, &buffer, &stride, &offset);
 }
 
 /* * * * * * * * * * * * * * * * * * * * *
@@ -85,6 +85,7 @@ void IndexBuffer::Render()
 * ConstantBuffer
 * * * * * * * * * * * * * * * * * * * * */
 ConstantBuffer::ConstantBuffer(void* data, UINT dataSize)
+    : data(data), dataSize(dataSize)
 {
     D3D11_BUFFER_DESC desc;
     ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
