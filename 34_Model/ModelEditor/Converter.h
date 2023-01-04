@@ -6,7 +6,7 @@ public:
     Converter();
     ~Converter();
 
-    void ReadFile();
+    void ReadFile(wstring file);
 
 public:
     void ExportMesh(wstring savePath);

@@ -2,10 +2,11 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "ExportFile.h"
 
 void Main::Initialize()
 {
-	
+	Push(new ExportFile());
 }
 
 void Main::Ready()
