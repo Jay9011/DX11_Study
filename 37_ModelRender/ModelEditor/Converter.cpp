@@ -63,7 +63,7 @@ void Converter::ReadBoneData(aiNode* node, int index, int parent)
 
 void Converter::ReadMeshData(aiNode* node, int bone)
 {
-    if (node->mNumChildren < 1) return;
+    if (node->mNumMeshes < 1) return;
 
     asMesh* mesh = new asMesh();
     mesh->Name = node->mName.C_Str();

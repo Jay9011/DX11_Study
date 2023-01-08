@@ -14,6 +14,8 @@ public:
     virtual void ResizeScreen() override {}
 
 private:
+    void Airplane();
+    void Tower();
     void Tank();
 
 };
