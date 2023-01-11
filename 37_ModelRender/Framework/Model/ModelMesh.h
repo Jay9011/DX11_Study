@@ -84,6 +84,7 @@ private:
     PerFrame* perFrame = nullptr;
 
     wstring materialName = L"";
+    Material* material;
 
     int boneIndex;
     class ModelBone* bone;

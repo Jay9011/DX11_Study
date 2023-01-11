@@ -2,6 +2,7 @@
 #include "Converter.h"
 #include "Types.h"
 #include "Utilities/BinaryFile.h"
+#include "Utilities/Xml.h"
 
 Converter::Converter()
 {
@@ -141,4 +142,207 @@ void Converter::WriteMeshData(wstring savePath)
 
     w->Close();
     SafeDelete(w);
+}
+
+void Converter::ExportMaterial(wstring savePath, bool isOverwrite)
+{
+    savePath = L"../../_Textures/" + savePath + L".material";
+
+    if (isOverwrite == false)
+    {
+        if (Path::ExistFile(savePath) == true)
+            return;
+    }
+
+    ReadMaterialData();
+    WriteMaterialData(savePath);
+}
+
+void Converter::ReadMaterialData()
+{
+    for (UINT i = 0; i < scene->mNumMaterials; i++)
+    {
+        aiMaterial* srcMaterial = scene->mMaterials[i];
+        asMaterial* material = new asMaterial();
+
+        material->Name = srcMaterial->GetName().C_Str();
+
+
+        aiColor3D color;
+
+        srcMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
+        material->Ambient = Color(color.r, color.g, color.b, 1.0f);
+
+        srcMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        material->Diffuse = Color(color.r, color.g, color.b, 1.0f);
+
+        srcMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
+        material->Specular = Color(color.r, color.g, color.b, 1.0f);
+
+        srcMaterial->Get(AI_MATKEY_SHININESS, material->Specular.a);
+
+        srcMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+        material->Emissive = Color(color.r, color.g, color.b, 1.0f);
+
+
+        aiString file;
+
+        srcMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &file);
+        material->DiffuseFile = file.C_Str();
+        
+        srcMaterial->GetTexture(aiTextureType_SPECULAR, 0, &file);
+        material->SpecularFile = file.C_Str();
+        
+        srcMaterial->GetTexture(aiTextureType_NORMALS, 0, &file);
+        material->NormalFile = file.C_Str();
+
+        materials.push_back(material);
+    }
+}
+
+void Converter::WriteMaterialData(wstring savePath)
+{
+    string folder = String::ToString(Path::GetDirectoryName(savePath));
+    string file = String::ToString(Path::GetFileName(savePath));
+
+    Path::CreateFolders(folder);
+
+    /* Init XML */
+    Xml::XMLDocument* document = new Xml::XMLDocument();
+
+    Xml::XMLDeclaration* decl = document->NewDeclaration();
+    document->LinkEndChild(decl);
+
+    Xml::XMLElement* root = document->NewElement("Materials");
+    root->SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    root->SetAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+    document->LinkEndChild(root);
+    /* * * * * * */
+
+    for (asMaterial* material : materials)
+    {
+        Xml::XMLElement* node = document->NewElement("Material");
+        root->LinkEndChild(node);
+
+        Xml::XMLElement* element = NULL;
+
+        element = document->NewElement("Name");
+        element->SetText(material->Name.c_str());
+        node->LinkEndChild(element);
+
+        element = document->NewElement("DiffuseFile");
+        element->SetText(WriteTexture(folder, material->DiffuseFile).c_str());
+        node->LinkEndChild(element);
+
+        element = document->NewElement("SpecularFile");
+        element->SetText(WriteTexture(folder, material->SpecularFile).c_str());
+        node->LinkEndChild(element);
+
+        element = document->NewElement("NormalFile");
+        element->SetText(WriteTexture(folder, material->NormalFile).c_str());
+        node->LinkEndChild(element);
+
+
+        element = document->NewElement("Ambient");
+        element->SetAttribute("R", material->Ambient.r);
+        element->SetAttribute("G", material->Ambient.g);
+        element->SetAttribute("B", material->Ambient.b);
+        element->SetAttribute("A", material->Ambient.a);
+        node->LinkEndChild(element);
+
+        element = document->NewElement("Diffuse");
+        element->SetAttribute("R", material->Diffuse.r);
+        element->SetAttribute("G", material->Diffuse.g);
+        element->SetAttribute("B", material->Diffuse.b);
+        element->SetAttribute("A", material->Diffuse.a);
+        node->LinkEndChild(element);
+
+        element = document->NewElement("Specular");
+        element->SetAttribute("R", material->Specular.r);
+        element->SetAttribute("G", material->Specular.g);
+        element->SetAttribute("B", material->Specular.b);
+        element->SetAttribute("A", material->Specular.a);
+        node->LinkEndChild(element);
+
+        element = document->NewElement("Emissive");
+        element->SetAttribute("R", material->Emissive.r);
+        element->SetAttribute("G", material->Emissive.g);
+        element->SetAttribute("B", material->Emissive.b);
+        element->SetAttribute("A", material->Emissive.a);
+        node->LinkEndChild(element);
+
+        SafeDelete(material);
+    }
+
+
+    document->SaveFile((folder + file).c_str());
+    SafeDelete(document);
+}
+
+string Converter::WriteTexture(string saveFolder, string file)
+{
+    if (file.length() < 1) return "";
+
+    string fileName = Path::GetFileName(file);
+    // 내장 텍스처가 있다면 텍스처 객체를 리턴하고 없다면 null이 리턴된다.
+    const aiTexture* texture = scene->GetEmbeddedTexture(file.c_str());
+
+    string path = "";
+    if (texture != nullptr)
+    {
+        path = saveFolder + fileName;
+
+        // 텍스처에 높이가 없는 경우 (데이터가 바이트파일로 써져있는 경우)
+        if (texture->mHeight < 1)
+        {
+            BinaryWriter w;
+            w.Open(String::ToWString(path));
+            // 해당 경로에 데이터를 사용해서 텍스처파일을 만듭니다.
+            w.Byte(texture->pcData, texture->mWidth);
+            w.Close();
+        }
+        // 텍스처 파일에 높이가 존재하는 경우
+        else
+        {
+            D3D11_TEXTURE2D_DESC destDesc;
+            ZeroMemory(&destDesc, sizeof(D3D11_TEXTURE2D_DESC));
+            destDesc.Width = texture->mWidth;
+            destDesc.Height = texture->mHeight;
+            destDesc.MipLevels = 1;
+            destDesc.ArraySize = 1;
+            destDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            destDesc.SampleDesc.Count = 1;
+            destDesc.SampleDesc.Quality = 0;
+            destDesc.Usage = D3D11_USAGE_IMMUTABLE;
+
+            D3D11_SUBRESOURCE_DATA subResource = { 0 };
+            subResource.pSysMem = texture->pcData;
+
+
+            ID3D11Texture2D* dest;
+
+            HRESULT hr;
+            hr = D3D::GetDevice()->CreateTexture2D(&destDesc, &subResource, &dest);
+            assert(SUCCEEDED(hr));
+
+            D3DX11SaveTextureToFileA(D3D::GetDC(), dest, D3DX11_IFF_PNG, saveFolder.c_str());
+        }
+    }
+    // 텍스처 파일이 별도로 존재하는 경우 (파일이 따로 존재하는 경우)
+    else
+    {
+        string directory = Path::GetDirectoryName(String::ToString(this->file));
+        string origin = directory + file;
+        String::Replace(&origin, "\\", "/");
+
+        if (Path::ExistFile(origin) == false)
+            return "";
+
+        path = saveFolder + fileName;
+        CopyFileA(origin.c_str(), path.c_str(), FALSE);
+
+        String::Replace(&path, "../../_Textures/", "");
+    }//if (texture != nullptr)
+
+    return Path::GetFileName(path);
 }

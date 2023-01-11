@@ -42,6 +42,11 @@ void ModelRender::Render()
 void ModelRender::ReadMesh(wstring file)
 {
 	model->ReadMesh(file);
+}
+
+void ModelRender::ReadMaterial(wstring file)
+{
+	model->ReadMaterial(file);
 
 	isRead = true;
 }
@@ -69,4 +74,9 @@ void ModelRender::UpdateTransform(ModelBone* bone, Matrix& matrix)
 
 void ModelRender::UpdateBones(ModelBone* bone, Matrix& matrix)
 {
+	Matrix temp = bone->Transform();
+	bone->Transform(temp * matrix);
+
+	for (ModelBone* child : bone->Childs())
+		UpdateBones(child, matrix);
 }

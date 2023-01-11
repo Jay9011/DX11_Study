@@ -12,6 +12,7 @@ void ModelDemo::Initialize()
 	Airplane();
 	Tower();
 	Tank();
+	Kachujin();
 
 	sky = new CubeSky(L"Environment/GrassCube1024.dds");
 
@@ -28,7 +29,18 @@ void ModelDemo::Update()
 
 	if (airplane != nullptr) airplane->Update();
 	if (tower != nullptr) tower->Update();
-	if (tank != nullptr) tank->Update();
+	if (tank != nullptr)
+	{
+		ModelBone* bone = tank->GetModel()->BoneByIndex(10);
+
+		Transform transform;
+		float rotation = sinf(Time::Get()->Running()) * Math::PI * Time::Delta();
+		transform.Rotation(0, rotation, 0);
+
+		tank->UpdateTransform(bone, transform.World());
+		tank->Update();
+	}
+	if (kachujin != nullptr) kachujin->Update();
 }
 
 void ModelDemo::Render()
@@ -61,12 +73,19 @@ void ModelDemo::Render()
 		tank->Pass(pass);
 		tank->Render();
 	}
+
+	if (kachujin != nullptr)
+	{
+		kachujin->Pass(pass);
+		kachujin->Render();
+	}
 }
 
 void ModelDemo::Airplane()
 {
 	airplane = new ModelRender(shader);
 	airplane->ReadMesh(L"B787/Airplane");
+	airplane->ReadMaterial(L"B787/Airplane");
 	airplane->GetTransform()->Scale(0.005f, 0.005f, 0.005f);
 }
 
@@ -74,6 +93,7 @@ void ModelDemo::Tower()
 {
 	tower = new ModelRender(shader);
 	tower->ReadMesh(L"Tower/Tower");
+	tower->ReadMaterial(L"Tower/Tower");
 	tower->GetTransform()->Position(-20, 0, 0);
 	tower->GetTransform()->Scale(0.01f, 0.01f, 0.01f);
 }
@@ -82,5 +102,15 @@ void ModelDemo::Tank()
 {
 	tank = new ModelRender(shader);
 	tank->ReadMesh(L"Tank/Tank");
+	tank->ReadMaterial(L"Tank/Tank");
 	tank->GetTransform()->Position(20, 0, 0);
+}
+
+void ModelDemo::Kachujin()
+{
+	kachujin = new ModelRender(shader);
+	kachujin->ReadMesh(L"Kachujin/Mesh");
+	kachujin->ReadMaterial(L"Kachujin/Mesh");
+	kachujin->GetTransform()->Position(0, 0, -30);
+	kachujin->GetTransform()->Scale(0.025f, 0.025f, 0.025f);
 }

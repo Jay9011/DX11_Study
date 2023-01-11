@@ -17,5 +17,6 @@ private:
     void Airplane();
     void Tower();
     void Tank();
+    void Kachujin();
 
 };

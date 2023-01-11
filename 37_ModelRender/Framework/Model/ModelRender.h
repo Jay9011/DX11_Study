@@ -10,6 +10,7 @@ public:
 
 public:
     void ReadMesh(wstring file);
+    void ReadMaterial(wstring file);
 
     Transform* GetTransform() { return transform; }
     Model* GetModel() { return model; }

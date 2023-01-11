@@ -17,6 +17,7 @@ private:
     void Airplane();
     void Tower();
     void Tank();
+    void Kachujin();
 
 private:
     Shader* shader;
@@ -24,6 +25,8 @@ private:
     ModelRender* airplane = nullptr;
     ModelRender* tower = nullptr;
     ModelRender* tank = nullptr;
+    ModelRender* kachujin = nullptr;
+
 
     CubeSky* sky;
 
