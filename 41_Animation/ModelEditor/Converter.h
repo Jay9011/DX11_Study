@@ -25,6 +25,15 @@ private:
     void WriteMaterialData(wstring savePath);
     string WriteTexture(string saveFolder, string file);
 
+public:
+    void ClipList(vector<wstring>* list);
+    void ExportAnimClip(UINT index, wstring savePath);
+
+private:
+    struct asClip* ReadClipData(aiAnimation* animation);
+    void ReadKeyframeData(struct asClip* clip, aiNode* node, vector<struct asClipNode>& aiNodeInfos);
+    void WriteClipData(struct asClip* clip, wstring savePath);
+
 private:
     wstring file;
 

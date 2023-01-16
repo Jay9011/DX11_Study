@@ -432,3 +432,108 @@ string Converter::WriteTexture(string saveFolder, string file)
 
     return Path::GetFileName(path);
 }
+
+void Converter::ClipList(vector<wstring>* list)
+{
+    for (UINT i = 0; i < scene->mNumAnimations; i++)
+    {
+        aiAnimation* anim = scene->mAnimations[i];
+
+        list->push_back(String::ToWString(anim->mName.C_Str()));
+    }//for(scene->Animations)
+}
+
+void Converter::ExportAnimClip(UINT index, wstring savePath)
+{
+    savePath = L"../../_Models/" + savePath + L".clip";
+
+    asClip* clip = ReadClipData(scene->mAnimations[index]);
+    WriteClipData(clip, savePath);
+}
+
+asClip* Converter::ReadClipData(aiAnimation* animation)
+{
+    asClip* clip = new asClip();
+    clip->Name = animation->mName.C_Str();
+    clip->FrameRate = (float)animation->mTicksPerSecond;
+    clip->FrameCount = (UINT)animation->mDuration + 1;
+
+    vector<asClipNode> aniNodeInfos;
+    for (UINT i = 0; i < animation->mNumChannels; i++)
+    {
+        aiNodeAnim* aniNode = animation->mChannels[i];
+
+        asClipNode aniNodeInfo;
+        aniNodeInfo.Name = aniNode->mNodeName;
+
+        UINT keyCount = max(aniNode->mNumPositionKeys, aniNode->mNumScalingKeys);
+        keyCount = max(keyCount, aniNode->mNumRotationKeys);
+
+
+        for (UINT k = 0; k < keyCount; k++)
+        {
+            asKeyframeData frameData;
+
+            bool bFound = false;
+            UINT t = aniNodeInfo.Keyframe.size();
+
+            if (fabsf((float)aniNode->mPositionKeys[k].mTime - (float)t) <= D3DX_16F_EPSILON)
+            {
+                aiVectorKey key = aniNode->mPositionKeys[k];
+                frameData.Time = (float)key.mTime;
+                memcpy_s(&frameData.Translation, sizeof(Vector3), &key.mValue, sizeof(aiVector3D));
+
+                bFound = true;
+            }
+            
+            if (fabsf((float)aniNode->mRotationKeys[k].mTime - (float)t) <= D3DX_16F_EPSILON)
+            {
+                aiQuatKey key = aniNode->mRotationKeys[k];
+                frameData.Time = (float)key.mTime;
+
+                frameData.Rotation.x = key.mValue.x;
+                frameData.Rotation.y = key.mValue.y;
+                frameData.Rotation.z = key.mValue.z;
+                frameData.Rotation.w = key.mValue.w;
+
+                bFound = true;
+            }
+
+            if (fabsf((float)aniNode->mScalingKeys[k].mTime - (float)t) <= D3DX_16F_EPSILON)
+            {
+                aiVectorKey key = aniNode->mScalingKeys[k];
+                frameData.Time = (float)key.mTime;
+                memcpy_s(&frameData.Scale, sizeof(Vector3), &key.mValue, sizeof(aiVector3D));
+
+                bFound = true;
+            }
+
+            if (bFound)
+                aniNodeInfo.Keyframe.push_back(frameData);
+        }//for(keyCount)
+
+        if (aniNodeInfo.Keyframe.size() < clip->FrameCount)
+        {
+            UINT count = clip->FrameCount - aniNodeInfo.Keyframe.size();
+            asKeyframeData keyFrame = aniNodeInfo.Keyframe.back();
+
+            for (UINT n = 0; n < count; n++)
+                aniNodeInfo.Keyframe.push_back(keyFrame);
+        }
+        clip->Duration = max(clip->Duration, aniNodeInfo.Keyframe.back().Time);
+
+        aniNodeInfos.push_back(aniNodeInfo);
+    }//for(animation->mNumChannels)
+
+
+
+    return nullptr;
+}
+
+void Converter::ReadKeyframeData(asClip* clip, aiNode* node, vector<struct asClipNode>& aiNodeInfos)
+{
+}
+
+void Converter::WriteClipData(asClip* clip, wstring savePath)
+{
+}

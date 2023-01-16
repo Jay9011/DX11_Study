@@ -39,9 +39,30 @@ void ExportFile::Tank()
 
 void ExportFile::Kachujin()
 {
-	Converter* conv = new Converter();
+	Converter* conv = nullptr;
+
+	conv = new Converter();
 	conv->ReadFile(L"Kachujin/Mesh.fbx");
 	conv->ExportMesh(L"Kachujin/Mesh");
 	conv->ExportMaterial(L"Kachujin/Mesh");
 	SafeDelete(conv);
+
+	conv = new Converter();
+	conv->ReadFile(L"Kachujin/Sword And Shield Idle.fbx");
+	SafeDelete(conv);
+	
+	//conv = new Converter();
+	//conv->ReadFile(L"Kachujin/Sword And Shield Walk.fbx");
+	//SafeDelete(conv);
+	//
+	//conv = new Converter();
+	//conv->ReadFile(L"Kachujin/Sword And Shield Run.fbx");
+	//SafeDelete(conv);
+	//
+	//conv = new Converter();
+	//conv->ReadFile(L"Kachujin/Sword And Shield Slash.fbx");
+	//SafeDelete(conv);
+
+	//vector<wstring> clipNames;
+	//conv->ClipList(&clipNames);
 }
