@@ -525,15 +525,76 @@ asClip* Converter::ReadClipData(aiAnimation* animation)
         aniNodeInfos.push_back(aniNodeInfo);
     }//for(animation->mNumChannels)
 
+    ReadKeyframeData(clip, scene->mRootNode, aniNodeInfos);
 
-
-    return nullptr;
+    return clip;
 }
 
 void Converter::ReadKeyframeData(asClip* clip, aiNode* node, vector<struct asClipNode>& aiNodeInfos)
 {
+    asKeyframe* keyframe = new asKeyframe();
+    keyframe->BoneName = node->mName.C_Str();
+
+    for (UINT i = 0; i < clip->FrameCount; i++)
+    {
+        asClipNode* asClipNode = nullptr;
+
+        for (UINT n = 0; n < aiNodeInfos.size(); n++)
+        {
+            if (aiNodeInfos[n].Name == node->mName)
+            {
+                asClipNode = &aiNodeInfos[n];
+
+                break;
+            }
+        }//for(aiNodeInfos.size())
+
+        asKeyframeData frameData;
+        if (asClipNode == nullptr)
+        {
+            Matrix transform(node->mTransformation[0]);
+            D3DXMatrixTranspose(&transform, &transform);
+
+            frameData.Time = (float)i;
+            D3DXMatrixDecompose(&frameData.Scale, &frameData.Rotation, &frameData.Translation, &transform);
+        }
+        else
+        {
+            frameData = asClipNode->Keyframe[i];
+        }
+
+        keyframe->Transforms.push_back(frameData);
+    }//for(clip->FrameCount)
+
+    clip->Keyframes.push_back(keyframe);
+
+    for (UINT i = 0; i < node->mNumChildren; i++)
+        ReadKeyframeData(clip, node->mChildren[i], aiNodeInfos);
 }
 
 void Converter::WriteClipData(asClip* clip, wstring savePath)
 {
+    Path::CreateFolders(Path::GetDirectoryName(savePath));
+
+    BinaryWriter* w = new BinaryWriter();
+    w->Open(savePath);
+
+    w->String(clip->Name);
+    w->Float(clip->Duration);
+    w->Float(clip->FrameRate);
+    w->UInt(clip->FrameCount);
+
+    w->UInt(clip->Keyframes.size());
+    for (asKeyframe* keyframe : clip->Keyframes)
+    {
+        w->String(keyframe->BoneName);
+
+        w->UInt(keyframe->Transforms.size());
+        w->Byte(&keyframe->Transforms[0], sizeof(asKeyframeData) * keyframe->Transforms.size());
+
+        SafeDelete(keyframe);
+    }
+
+    w->Close();
+    SafeDelete(w);
 }

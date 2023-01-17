@@ -17,6 +17,9 @@ Model::~Model()
 
 	for (Material* material : materials)
 		SafeDelete(material);
+
+	for (ModelClip* clip : clips)
+		SafeDelete(clip);
 }
 
 ModelBone* Model::BoneByName(wstring name)
@@ -47,6 +50,17 @@ Material* Model::MaterialByName(wstring name)
 	{
 		if (material->Name() == name)
 			return material;
+	}
+
+	return NULL;
+}
+
+ModelClip* Model::ClipByName(wstring name)
+{
+	for (ModelClip* clip : clips)
+	{
+		if (clip->name == name)
+			return clip;
 	}
 
 	return NULL;
@@ -238,4 +252,44 @@ void Model::ReadMaterial(wstring file)
 	} while (materialNode != NULL);
 
 	BindMesh();
+}
+
+void Model::ReadClip(wstring file)
+{
+	file = L"../../_Models/" + file + L".clip";
+
+	BinaryReader* r = new BinaryReader();
+	r->Open(file);
+
+
+	ModelClip* clip = new ModelClip();
+
+	clip->name = String::ToWString(r->String());
+	clip->duration = r->Float();
+	clip->frameRate = r->Float();
+	clip->frameCount = r->UInt();
+
+	UINT keyframesCount = r->UInt();
+	for (UINT i = 0; i < keyframesCount; i++)
+	{
+		ModelKeyframe* keyframe = new ModelKeyframe();
+		keyframe->BoneName = String::ToWString(r->String());
+
+
+		UINT size = r->UInt();
+		if (size > 0)
+		{
+			keyframe->Transforms.assign(size, ModelKeyframeData());
+
+			void* ptr = (void*)&keyframe->Transforms[0];
+			r->Byte(&ptr, sizeof(ModelKeyframeData) * size);
+		}
+
+		clip->keyframeMap[keyframe->BoneName] = keyframe;
+	}
+
+	r->Close();
+	SafeDelete(r);
+
+	clips.push_back(clip);
 }
