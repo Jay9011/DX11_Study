@@ -8,6 +8,10 @@ public:
     void Update();
     void Render();
 
+private:
+	void UpdateTweenMode();
+	void UpdateBlendMode();
+
 public:
     void ReadMesh(wstring file);
     void ReadMaterial(wstring file);
@@ -19,6 +23,8 @@ public:
     void Pass(UINT pass);
 
 	void PlayTweenMode(UINT clip, float speed = 1.0f, float takeTime = 1.0f);
+	void PlayBlendMode(UINT clip, UINT clip1, UINT clip2);
+	void SetBlendAlpha(float alpha);
 
 private:
 	void CreateTexture();
@@ -85,6 +91,18 @@ private:
 			Next.Clip = -1;	// -1 : 다음 clip이 없음
 		}
 	} tweenDesc;
+
+	struct BlendDesc
+	{
+		UINT Mode = 0;	// Blending 여부
+		float Alpha = 0;// Blending 강도
+		Vector2 Padding;
+
+		KeyframeDesc Clip[3];	// Blending 할 animation들 리스트
+	} blendDesc;
+
+	ConstantBuffer* blendBuffer;
+	ID3DX11EffectConstantBuffer* sBlendBuffer;
 
 private:
     Shader* shader;

@@ -9,6 +9,9 @@ ModelAnimator::ModelAnimator(Shader* shader)
 
     frameBuffer = new ConstantBuffer(&tweenDesc, sizeof(TweenDesc));
     sFrameBuffer = shader->AsConstantBuffer("CB_TweenFrame");
+
+    blendBuffer = new ConstantBuffer(&blendDesc, sizeof(BlendDesc));
+    sBlendBuffer = shader->AsConstantBuffer("CB_BlendFrame");
 }
 
 ModelAnimator::~ModelAnimator()
@@ -21,9 +24,44 @@ ModelAnimator::~ModelAnimator()
     SafeRelease(srv);
 
     SafeDelete(frameBuffer);
+    SafeDelete(blendBuffer);
 }
 
 void ModelAnimator::Update()
+{
+    if (blendDesc.Mode == 0)
+        UpdateTweenMode();
+    else
+        UpdateBlendMode();
+    
+    if (texture == nullptr)
+    {
+        for (ModelMesh* mesh : model->Meshes())
+            mesh->SetShader(shader);
+
+        CreateTexture();
+    }
+
+    for (ModelMesh* mesh : model->Meshes())
+        mesh->Update();
+}
+
+void ModelAnimator::Render()
+{
+    frameBuffer->Render();
+    sFrameBuffer->SetConstantBuffer(frameBuffer->Buffer());
+    
+    blendBuffer->Render();
+    sBlendBuffer->SetConstantBuffer(blendBuffer->Buffer());
+
+    for (ModelMesh* mesh : model->Meshes())
+    {
+        mesh->SetTransform(transform);
+        mesh->Render();
+    }
+}
+
+void ModelAnimator::UpdateTweenMode()
 {
     TweenDesc& desc = tweenDesc;
 
@@ -83,28 +121,27 @@ void ModelAnimator::Update()
             desc.Next.Time = desc.Next.RunningTime / time;
         }
     }
-
-    if (texture == nullptr)
-    {
-        for (ModelMesh* mesh : model->Meshes())
-            mesh->SetShader(shader);
-
-        CreateTexture();
-    }
-
-    for (ModelMesh* mesh : model->Meshes())
-        mesh->Update();
 }
 
-void ModelAnimator::Render()
+void ModelAnimator::UpdateBlendMode()
 {
-    frameBuffer->Render();
-    sFrameBuffer->SetConstantBuffer(frameBuffer->Buffer());
+    BlendDesc& desc = blendDesc;
 
-    for (ModelMesh* mesh : model->Meshes())
+    for (UINT i = 0; i < 3; i++)
     {
-        mesh->SetTransform(transform);
-        mesh->Render();
+        ModelClip* clip = model->ClipByIndex(desc.Clip[i].Clip);
+
+        desc.Clip[i].RunningTime += Time::Delta();
+
+        float time = 1.0f / clip->FrameRate() / desc.Clip[i].Speed;
+        if (desc.Clip[i].Time >= 1.0f)
+        {
+            desc.Clip[i].RunningTime = 0;
+
+            desc.Clip[i].CurrFrame = (desc.Clip[i].CurrFrame + 1) % clip->FrameCount();
+            desc.Clip[i].NextFrame = (desc.Clip[i].CurrFrame + 1) % clip->FrameCount();
+        }
+        desc.Clip[i].Time = desc.Clip[i].RunningTime / time;
     }
 }
 
@@ -131,10 +168,29 @@ void ModelAnimator::Pass(UINT pass)
 
 void ModelAnimator::PlayTweenMode(UINT clip, float speed, float takeTime)
 {
+    blendDesc.Mode = 0;
+
     tweenDesc.TakeTime = takeTime;
 
     tweenDesc.Next.Clip = clip;
     tweenDesc.Next.Speed = speed;
+}
+
+void ModelAnimator::PlayBlendMode(UINT clip, UINT clip1, UINT clip2)
+{
+    blendDesc.Mode = 1;
+
+    blendDesc.Clip[0].Clip = clip;
+    blendDesc.Clip[1].Clip = clip1;
+    blendDesc.Clip[2].Clip = clip2;
+}
+
+void ModelAnimator::SetBlendAlpha(float alpha)
+{
+    // Blending 강도를 0 ~ 2로 제한합니다.
+    alpha = Math::Clamp(alpha, 0.0f, 2.0f);
+
+    blendDesc.Alpha = alpha;
 }
 
 void ModelAnimator::CreateTexture()

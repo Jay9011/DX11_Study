@@ -36,38 +36,38 @@ void Converter::ExportMesh(wstring savePath)
     ReadBoneData(scene->mRootNode, -1, -1);
     ReadSkinData();
 
-    //Write CSV File
-    {
-        FILE* file;
-        fopen_s(&file, "../Vertices.csv", "w");
+    ////Write CSV File
+    //{
+    //    FILE* file;
+    //    fopen_s(&file, "../Vertices.csv", "w");
 
-        for (asBone* bone : bones)
-        {
-            string name = bone->Name;
-            fprintf(file, "%d,%s\n", bone->Index, bone->Name.c_str());
-        }
+    //    for (asBone* bone : bones)
+    //    {
+    //        string name = bone->Name;
+    //        fprintf(file, "%d,%s\n", bone->Index, bone->Name.c_str());
+    //    }
 
-        fprintf(file, "\n");
+    //    fprintf(file, "\n");
 
-        for (asMesh* mesh : meshes)
-        {
-            string name = mesh->Name;
-            printf("%s\n", name.c_str());
+    //    for (asMesh* mesh : meshes)
+    //    {
+    //        string name = mesh->Name;
+    //        printf("%s\n", name.c_str());
 
-            for (UINT i = 0; i < mesh->Vertices.size(); i++)
-            {
-                Vector3 p = mesh->Vertices[i].Position;
-                Vector4 indices = mesh->Vertices[i].BlendIndices;
-                Vector4 weights = mesh->Vertices[i].BlendWeights;
+    //        for (UINT i = 0; i < mesh->Vertices.size(); i++)
+    //        {
+    //            Vector3 p = mesh->Vertices[i].Position;
+    //            Vector4 indices = mesh->Vertices[i].BlendIndices;
+    //            Vector4 weights = mesh->Vertices[i].BlendWeights;
 
-                fprintf(file, "%f,%f,%f,", p.x, p.y, p.z);
-                fprintf(file, "%f,%f,%f,%f,", indices.x, indices.y, indices.z, indices.w);
-                fprintf(file, "%f,%f,%f,%f\n", weights.x, weights.y, weights.z, weights.w);
-            }
-        }//for(meshs)
+    //            fprintf(file, "%f,%f,%f,", p.x, p.y, p.z);
+    //            fprintf(file, "%f,%f,%f,%f,", indices.x, indices.y, indices.z, indices.w);
+    //            fprintf(file, "%f,%f,%f,%f\n", weights.x, weights.y, weights.z, weights.w);
+    //        }
+    //    }//for(meshs)
 
-        fclose(file);
-    }
+    //    fclose(file);
+    //}
 
     WriteMeshData(savePath);
 }
