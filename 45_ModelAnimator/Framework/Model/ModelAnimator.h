@@ -18,6 +18,8 @@ public:
 
     void Pass(UINT pass);
 
+	void PlayTweenMode(UINT clip, float speed = 1.0f, float takeTime = 1.0f);
+
 private:
 	void CreateTexture();
 	void CreateClipTransform(UINT index);
@@ -62,10 +64,27 @@ private:
 		float Speed = 1.0f;
 
 		Vector2 Padding;
-	} keyframeDesc;
+	}; //keyframeDesc;
 
 	ConstantBuffer* frameBuffer;
 	ID3DX11EffectConstantBuffer* sFrameBuffer;
+
+	struct TweenDesc
+	{
+		float TakeTime = 1.0f;	// 애니메이션 전환 시간
+		float TweenTime = 0.0f;	// 현재 전환되어 가는 시간
+		float ChangeTime = 0.0f;
+		float Padding;
+
+		KeyframeDesc Curr;	// 보간해 갈 현재 Keyframe
+		KeyframeDesc Next;	// 보간해 갈 다음 Keyframe
+
+		TweenDesc()
+		{
+			Curr.Clip = 0;
+			Next.Clip = -1;	// -1 : 다음 clip이 없음
+		}
+	} tweenDesc;
 
 private:
     Shader* shader;

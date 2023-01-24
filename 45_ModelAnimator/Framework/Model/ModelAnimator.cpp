@@ -7,8 +7,8 @@ ModelAnimator::ModelAnimator(Shader* shader)
     model = new Model();
     transform = new Transform(shader);
 
-    frameBuffer = new ConstantBuffer(&keyframeDesc, sizeof(KeyframeDesc));
-    sFrameBuffer = shader->AsConstantBuffer("CB_AnimationFrame");
+    frameBuffer = new ConstantBuffer(&tweenDesc, sizeof(TweenDesc));
+    sFrameBuffer = shader->AsConstantBuffer("CB_TweenFrame");
 }
 
 ModelAnimator::~ModelAnimator()
@@ -25,11 +25,64 @@ ModelAnimator::~ModelAnimator()
 
 void ModelAnimator::Update()
 {
-    ImGui::InputInt("Clip", &keyframeDesc.Clip);
-    keyframeDesc.Clip %= model->ClipCount();
+    TweenDesc& desc = tweenDesc;
 
-    ImGui::InputInt("CurrFrame", (int*)&keyframeDesc.CurrFrame);
-    keyframeDesc.CurrFrame %= model->ClipByIndex(keyframeDesc.Clip)->FrameCount();
+    // 현재 진행중인 애니메이션
+    {
+        ModelClip* clip = model->ClipByIndex(desc.Curr.Clip);
+
+        desc.Curr.RunningTime += Time::Delta();
+
+        float time = 1.0f / clip->FrameRate() / desc.Curr.Speed;
+        // 일정 시간이 지나면 다음 frame 진행
+        if (desc.Curr.Time >= 1.0f)
+        {
+            desc.Curr.RunningTime = 0;
+
+            desc.Curr.CurrFrame = (desc.Curr.CurrFrame + 1) % clip->FrameCount();
+            desc.Curr.NextFrame = (desc.Curr.CurrFrame + 1) % clip->FrameCount();
+        }
+        desc.Curr.Time = desc.Curr.RunningTime / time;
+    }
+
+    // 전환 할 다음 동작도 플레이 시켜줘야 한다.
+    if (desc.Next.Clip > -1) // clip이 존재하는 경우에만...
+    {
+        desc.ChangeTime += Time::Delta();
+        desc.TweenTime = desc.ChangeTime / desc.TakeTime;
+
+        // 전환이 완료된 경우
+        if (desc.TweenTime >= 1.0f)
+        {
+            desc.Curr = desc.Next;
+
+            desc.Next.Clip = -1;
+            desc.Next.CurrFrame = 0;
+            desc.Next.NextFrame = 0;
+            desc.Next.Time = 0;
+            desc.Next.RunningTime = 0.0f;
+
+            desc.ChangeTime = 0.0f;
+            desc.TweenTime = 0.0f;
+        }
+        // 전환하는 중, frame 진행
+        else
+        {
+            ModelClip* clip = model->ClipByIndex(desc.Next.Clip);
+
+            desc.Next.RunningTime += Time::Delta();
+
+            float time = 1.0f / clip->FrameRate() / desc.Next.Speed;
+            if (desc.Next.Time >= 1.0f)
+            {
+                desc.Next.RunningTime = 0;
+
+                desc.Next.CurrFrame = (desc.Next.CurrFrame + 1) % clip->FrameCount();
+                desc.Next.NextFrame = (desc.Next.CurrFrame + 1) % clip->FrameCount();
+            }
+            desc.Next.Time = desc.Next.RunningTime / time;
+        }
+    }
 
     if (texture == nullptr)
     {
@@ -74,6 +127,14 @@ void ModelAnimator::Pass(UINT pass)
 {
     for (ModelMesh* mesh : model->Meshes())
         mesh->Pass(pass);
+}
+
+void ModelAnimator::PlayTweenMode(UINT clip, float speed, float takeTime)
+{
+    tweenDesc.TakeTime = takeTime;
+
+    tweenDesc.Next.Clip = clip;
+    tweenDesc.Next.Speed = speed;
 }
 
 void ModelAnimator::CreateTexture()

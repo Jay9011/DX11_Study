@@ -4,8 +4,8 @@
 
 void AnimationDemo::Initialize()
 {
-	Context::Get()->GetCamera()->RotationDegree(20, 0, 0);
-	Context::Get()->GetCamera()->Position(1, 36, -85);
+	Context::Get()->GetCamera()->RotationDegree(17, 0, 0);
+	Context::Get()->GetCamera()->Position(0, 6, -40);
 
 	shader = new Shader(L"45_Animation.fx");
 
@@ -19,6 +19,22 @@ void AnimationDemo::Update()
 
 void AnimationDemo::Render()
 {
+	static float speed = 1.0f;
+	ImGui::SliderFloat("Speed", &speed, 0.1f, 5.0f);
+
+	static float takeTime = 1.0f;
+	ImGui::SliderFloat("TakeTime", &takeTime, 0.1f, 5.0f);
+
+
+	static int clip = 0;
+	if (Keyboard::Get()->Down(VK_SPACE))
+	{
+		clip++;
+		clip %= 5;
+
+		kachujin->PlayTweenMode(clip, speed, takeTime);
+	}
+
 	ImGui::SliderFloat3("Direction2", direction, -1, +1);
 	shader->AsVector("Direction2")->SetFloatVector(direction);
 
