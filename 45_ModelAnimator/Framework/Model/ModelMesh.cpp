@@ -61,6 +61,8 @@ void ModelMesh::SetShader(Shader* shader)
 	sBoneBuffer = shader->AsConstantBuffer("CB_Bone");
 
 	material->SetShader(shader);
+
+	sTransformsSRV = shader->AsSRV("TransformsMap");
 }
 
 void ModelMesh::Update()
@@ -82,6 +84,9 @@ void ModelMesh::Render()
 
 	vertexBuffer->Render();
 	indexBuffer->Render();
+
+	if (transformsSRV != NULL)
+		sTransformsSRV->SetResource(transformsSRV);
 
 	D3D::GetDC()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

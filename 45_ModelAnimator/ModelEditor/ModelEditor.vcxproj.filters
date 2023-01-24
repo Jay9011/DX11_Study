@@ -10,6 +10,9 @@
     <ClCompile Include="Converter.cpp">
       <Filter>Writer</Filter>
     </ClCompile>
+    <ClCompile Include="AnimationDemo.cpp">
+      <Filter>Demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -21,6 +24,9 @@
     </ClInclude>
     <ClInclude Include="Converter.h">
       <Filter>Writer</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationDemo.h">
+      <Filter>Demo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

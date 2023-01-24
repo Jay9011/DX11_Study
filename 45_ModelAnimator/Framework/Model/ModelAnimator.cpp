@@ -2,19 +2,35 @@
 #include "ModelAnimator.h"
 
 ModelAnimator::ModelAnimator(Shader* shader)
+    : shader(shader)
 {
     model = new Model();
     transform = new Transform(shader);
+
+    frameBuffer = new ConstantBuffer(&keyframeDesc, sizeof(KeyframeDesc));
+    sFrameBuffer = shader->AsConstantBuffer("CB_AnimationFrame");
 }
 
 ModelAnimator::~ModelAnimator()
 {
     SafeDelete(model);
     SafeDelete(transform);
+
+    SafeDeleteArray(clipTransforms);
+    SafeRelease(texture);
+    SafeRelease(srv);
+
+    SafeDelete(frameBuffer);
 }
 
 void ModelAnimator::Update()
 {
+    ImGui::InputInt("Clip", &keyframeDesc.Clip);
+    keyframeDesc.Clip %= model->ClipCount();
+
+    ImGui::InputInt("CurrFrame", (int*)&keyframeDesc.CurrFrame);
+    keyframeDesc.CurrFrame %= model->ClipByIndex(keyframeDesc.Clip)->FrameCount();
+
     if (texture == nullptr)
     {
         for (ModelMesh* mesh : model->Meshes())
@@ -29,6 +45,9 @@ void ModelAnimator::Update()
 
 void ModelAnimator::Render()
 {
+    frameBuffer->Render();
+    sFrameBuffer->SetConstantBuffer(frameBuffer->Buffer());
+
     for (ModelMesh* mesh : model->Meshes())
     {
         mesh->SetTransform(transform);
@@ -62,6 +81,67 @@ void ModelAnimator::CreateTexture()
     clipTransforms = new ClipTransform[model->ClipCount()];
     for (UINT i = 0; i < model->ClipCount(); i++)
         CreateClipTransform(i);
+
+    //Create Texture
+    {
+        D3D11_TEXTURE2D_DESC desc;
+        ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
+        desc.Width = MAX_MODEL_TRANSFORMS * 4;
+        desc.Height = MAX_MODEL_KEYFRAMES;
+        desc.ArraySize = model->ClipCount();
+        desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT; //16Byte * 4 = 64Byte
+        desc.Usage = D3D11_USAGE_IMMUTABLE;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        desc.MipLevels = 1;
+        desc.SampleDesc.Count = 1;
+
+        UINT pageSize = MAX_MODEL_TRANSFORMS * 4 * 16 * MAX_MODEL_KEYFRAMES;
+        void* p = VirtualAlloc(nullptr, pageSize * model->ClipCount(), MEM_RESERVE, PAGE_READWRITE);
+
+        // MEMORY_BASIC_INFORMATION, VirtualQuery 로 예약한 사이즈를 확인할 수 있다.
+
+        for (UINT c = 0; c < model->ClipCount(); c++)
+        {
+            UINT start = c * pageSize;
+
+            for (UINT k = 0; k < MAX_MODEL_KEYFRAMES; k++)
+            {
+                void* temp = (BYTE*)p + MAX_MODEL_TRANSFORMS * k * sizeof(Matrix) + start;
+
+                VirtualAlloc(temp, MAX_MODEL_TRANSFORMS * sizeof(Matrix), MEM_COMMIT, PAGE_READWRITE);
+                memcpy(temp, clipTransforms[c].Transform[k], MAX_MODEL_TRANSFORMS * sizeof(Matrix));
+            }//for(MAX_MODEL_KEYFRAMES)
+        }//for(model->ClipCount())
+
+        D3D11_SUBRESOURCE_DATA* subResources = new D3D11_SUBRESOURCE_DATA[model->ClipCount()];
+        for (UINT c = 0; c < model->ClipCount(); c++)
+        {
+            void* temp = (BYTE*)p + c * pageSize;
+
+            subResources[c].pSysMem = temp;
+            subResources[c].SysMemPitch = MAX_MODEL_TRANSFORMS * sizeof(Matrix);
+            subResources[c].SysMemSlicePitch = pageSize;
+        }//for(model->ClipCount())
+        Check(D3D::GetDevice()->CreateTexture2D(&desc, subResources, &texture));
+
+        SafeDeleteArray(subResources);
+        VirtualFree(p, 0, MEM_RELEASE);
+    }
+
+    //Create SRV
+    {
+        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+        ZeroMemory(&desc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+        desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+        desc.Texture2DArray.MipLevels = 1;
+        desc.Texture2DArray.ArraySize = model->ClipCount();
+
+        Check(D3D::GetDevice()->CreateShaderResourceView(texture, &desc, &srv));
+    }
+
+    for (ModelMesh* mesh : model->Meshes())
+        mesh->TransformsSRV(srv);
 }
 
 void ModelAnimator::CreateClipTransform(UINT index)

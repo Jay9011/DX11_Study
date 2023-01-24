@@ -25,7 +25,6 @@ private:
     ModelRender* airplane = nullptr;
     ModelRender* tower = nullptr;
     ModelRender* tank = nullptr;
-    ModelRender* kachujin = nullptr;
 
 
     CubeSky* sky;
