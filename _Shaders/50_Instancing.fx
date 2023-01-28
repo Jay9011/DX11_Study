@@ -8,7 +8,7 @@ struct VertexInput
     float2 Uv : Uv;
     float3 Normal : Normal;
     
-    matrix Transform : Inst1;
+    matrix Transform : Inst;
 };
 
 struct VertexOutput
