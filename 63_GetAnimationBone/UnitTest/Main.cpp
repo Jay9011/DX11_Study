@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "InstancingFrameDemo.h"
 #include "TextureBufferDemo.h"
 #include "RawBufferDemo.h"
 #include "ThreadDemo.h"
@@ -30,7 +31,8 @@
 
 void Main::Initialize()
 {
-	Push(new TextureBufferDemo());
+	Push(new InstancingFrameDemo());
+	//Push(new TextureBufferDemo());
 	//Push(new RawBufferDemo());
 	//Push(new ThreadDemo());
 	//Push(new InstancingDemo());

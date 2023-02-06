@@ -169,12 +169,14 @@
   <ItemGroup>
     <ClCompile Include="CubeDemo.cpp" />
     <ClCompile Include="CubeSkyDemo.cpp" />
+    <ClCompile Include="GetAnimationBoneDemo.cpp" />
     <ClCompile Include="GetHeightDemo.cpp" />
     <ClCompile Include="GetVerticalRaycast.cpp" />
     <ClCompile Include="GridDemo.cpp" />
     <ClCompile Include="HeightMapDemo.cpp" />
     <ClCompile Include="IndexDemo.cpp" />
     <ClCompile Include="InstancingDemo.cpp" />
+    <ClCompile Include="InstancingFrameDemo.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MeshDemo.cpp" />
     <ClCompile Include="NormalVectorDemo.cpp" />
@@ -203,12 +205,14 @@
   <ItemGroup>
     <ClInclude Include="CubeDemo.h" />
     <ClInclude Include="CubeSkyDemo.h" />
+    <ClInclude Include="GetAnimationBoneDemo.h" />
     <ClInclude Include="GetHeightDemo.h" />
     <ClInclude Include="GetVerticalRaycast.h" />
     <ClInclude Include="GridDemo.h" />
     <ClInclude Include="HeightMapDemo.h" />
     <ClInclude Include="IndexDemo.h" />
     <ClInclude Include="InstancingDemo.h" />
+    <ClInclude Include="InstancingFrameDemo.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="MeshDemo.h" />
     <ClInclude Include="NormalVectorDemo.h" />

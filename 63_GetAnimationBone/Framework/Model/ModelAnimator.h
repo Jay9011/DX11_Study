@@ -32,6 +32,7 @@ public:
 private:
 	void CreateTexture();
 	void CreateClipTransform(UINT index);
+	void CreateComputeBuffer();
 
 private:
 	struct ClipTransform
@@ -115,5 +116,38 @@ private:
 	Matrix worlds[MAX_MODEL_INSTANCE];
 
 	VertexBuffer* instanceBuffer;
+
+private:
+	struct CS_InputDesc
+	{
+		Matrix Bone;
+	};
+
+	struct CS_OutputDesc
+	{
+		Matrix Result;
+	};
+
+	struct AttachDesc
+	{
+		UINT BoneIndex = 40;
+		float Padding[3];
+	} attachDesc;
+
+private:
+	Shader* computeShader;
+	StructuredBuffer* computeBuffer = nullptr;
+
+	CS_InputDesc* csInput = nullptr;
+	CS_OutputDesc* csOutput = nullptr;
+
+	ID3DX11EffectShaderResourceVariable* sInputSRV;
+	ID3DX11EffectUnorderedAccessViewVariable* sOutputUAV;
+
+	ConstantBuffer* computeAttachBuffer;
+
+	ID3DX11EffectConstantBuffer* sComputeAttachBuffer;
+	ID3DX11EffectConstantBuffer* sComputeTweenBuffer;
+	ID3DX11EffectConstantBuffer* sComputeBlendBuffer;
 };
 
