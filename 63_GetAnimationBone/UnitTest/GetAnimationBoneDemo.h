@@ -17,6 +17,7 @@ private:
 	void Mesh();
 	void Airplane();
 	void Kachujin();
+	void KachujinCollider();
 
 	void Pass(UINT mesh, UINT model, UINT anim);
 
@@ -38,6 +39,7 @@ private:
 	ModelRender* airplane = nullptr;
 
 	ModelAnimator* kachujin = nullptr;
+	ColliderObject** colliders;
 
 	vector<MeshRender*> meshes;
 	vector<ModelRender*> models;

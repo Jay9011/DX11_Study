@@ -24,10 +24,14 @@ public:
 	Transform* AddTransform();
 	Transform* GetTransform(UINT index) { return transforms[index]; }
 	void UpdateTransforms();
+	UINT GetTransformCount() { return transforms.size(); }
 
 	void PlayTweenMode(UINT index, UINT clip, float speed = 1.0f, float takeTime = 1.0f);
 	void PlayBlendMode(UINT index, UINT clip, UINT clip1, UINT clip2);
 	void SetBlendAlpha(UINT index, float alpha);
+
+	void SetAttachTransform(UINT boneIndex);
+	void GetAttachTransform(UINT instance, Matrix* outResult);
 
 private:
 	void CreateTexture();
@@ -76,9 +80,6 @@ private:
 		Vector2 Padding;
 	}; //keyframeDesc;
 
-	ConstantBuffer* frameBuffer;
-	ID3DX11EffectConstantBuffer* sFrameBuffer;
-
 	struct TweenDesc
 	{
 		float TakeTime = 1.0f;	// 애니메이션 전환 시간
@@ -95,6 +96,10 @@ private:
 			Next.Clip = -1;	// -1 : 다음 clip이 없음
 		}
 	} tweenDesc[MAX_MODEL_INSTANCE];
+
+	ConstantBuffer* tweenBuffer;
+	ID3DX11EffectConstantBuffer* sTweenBuffer;
+
 
 	struct BlendDesc
 	{
@@ -130,7 +135,7 @@ private:
 
 	struct AttachDesc
 	{
-		UINT BoneIndex = 40;
+		UINT BoneIndex = 0;
 		float Padding[3];
 	} attachDesc;
 

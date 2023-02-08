@@ -125,6 +125,9 @@
     <ClCompile Include="Renders\Render2D.cpp">
       <Filter>Renders</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\Collider.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Renders">
@@ -282,6 +285,9 @@
     </ClInclude>
     <ClInclude Include="Renders\Render2D.h">
       <Filter>Renders</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Collider.h">
+      <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

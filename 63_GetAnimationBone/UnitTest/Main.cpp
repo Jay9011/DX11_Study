@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "GetAnimationBoneDemo.h"
 #include "InstancingFrameDemo.h"
 #include "TextureBufferDemo.h"
 #include "RawBufferDemo.h"
@@ -31,7 +32,8 @@
 
 void Main::Initialize()
 {
-	Push(new InstancingFrameDemo());
+	Push(new GetAnimationBoneDemo());
+	//Push(new InstancingFrameDemo());
 	//Push(new TextureBufferDemo());
 	//Push(new RawBufferDemo());
 	//Push(new ThreadDemo());
