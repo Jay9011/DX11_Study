@@ -252,6 +252,8 @@ void ModelAnimator::UpdateTransforms()
         memcpy(subResource.pData, worlds, sizeof(Matrix) * MAX_MESH_INSTANCE);
     }
     D3D::GetDC()->Unmap(instanceBuffer->Buffer(), 0);
+
+    inputWorldBuffer->CopyToInput(worlds);
 }
 
 void ModelAnimator::PlayTweenMode(UINT index, UINT clip, float speed, float takeTime)
@@ -281,26 +283,16 @@ void ModelAnimator::SetBlendAlpha(UINT index, float alpha)
     blendDesc[index].Alpha = alpha;
 }
 
-void ModelAnimator::SetAttachTransform(UINT boneIndex)
-{
-    //attachDesc.BoneIndex = boneIndex;
-}
-
 void ModelAnimator::GetAttachTransform(UINT instance, Matrix* outResult)
 {
-    //if (csOutput == nullptr)
-    //{
-    //    D3DXMatrixIdentity(outResult);
+    ID3D11Texture2D* texture = outputBuffer->Result();
 
-    //    return;
-    //}
-
-
-    //Matrix transform = model->BoneByIndex(attachDesc.BoneIndex)->Transform(); // 기준 본 행렬
-    //Matrix result = csOutput[instance].Result; // 애니메이션 행렬
-    //Matrix world = GetTransform(instance)->World();
-
-    //*outResult = transform * result * world;
+    D3D11_MAPPED_SUBRESOURCE subResource;
+    D3D::GetDC()->Map(texture, 0, D3D11_MAP_READ, 0, &subResource);
+    {
+        memcpy(outResult, (BYTE*)subResource.pData + (instance * subResource.RowPitch), sizeof(Matrix) * MAX_MODEL_TRANSFORMS);
+    }
+    D3D::GetDC()->Unmap(texture, 0);
 }
 
 void ModelAnimator::CreateTexture()

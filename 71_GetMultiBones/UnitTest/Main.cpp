@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "GetMultiBoneDemo.h"
 #include "ObbCollisionDemo.h"
 #include "ObbRaycastDemo.h"
 #include "GetRaycastDemo.h"
@@ -37,7 +38,8 @@
 
 void Main::Initialize()
 {
-	Push(new ObbCollisionDemo());
+	Push(new GetMultiBoneDemo());
+	//Push(new ObbCollisionDemo());
 	//Push(new ObbRaycastDemo());
 	//Push(new GetRaycastDemo());
 	//Push(new ProjectionDemo());

@@ -30,7 +30,6 @@ public:
 	void PlayBlendMode(UINT index, UINT clip, UINT clip1, UINT clip2);
 	void SetBlendAlpha(UINT index, float alpha);
 
-	void SetAttachTransform(UINT boneIndex);
 	void GetAttachTransform(UINT instance, Matrix* outResult);
 
 private:

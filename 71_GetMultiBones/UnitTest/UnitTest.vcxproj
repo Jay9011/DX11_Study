@@ -171,6 +171,7 @@
     <ClCompile Include="CubeSkyDemo.cpp" />
     <ClCompile Include="GetAnimationBoneDemo.cpp" />
     <ClCompile Include="GetHeightDemo.cpp" />
+    <ClCompile Include="GetMultiBoneDemo.cpp" />
     <ClCompile Include="GetRaycastDemo.cpp" />
     <ClCompile Include="GetVerticalRaycast.cpp" />
     <ClCompile Include="GridDemo.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="CubeSkyDemo.h" />
     <ClInclude Include="GetAnimationBoneDemo.h" />
     <ClInclude Include="GetHeightDemo.h" />
+    <ClInclude Include="GetMultiBoneDemo.h" />
     <ClInclude Include="GetRaycastDemo.h" />
     <ClInclude Include="GetVerticalRaycast.h" />
     <ClInclude Include="GridDemo.h" />

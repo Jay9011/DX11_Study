@@ -18,5 +18,6 @@ private:
     void Tower();
     void Tank();
     void Kachujin();
+    void Weapon();
 
 };

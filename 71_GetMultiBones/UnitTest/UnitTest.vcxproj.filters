@@ -99,6 +99,9 @@
     <ClCompile Include="ObbCollisionDemo.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
+    <ClCompile Include="GetMultiBoneDemo.cpp">
+      <Filter>DirectCompute</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -198,6 +201,9 @@
     </ClInclude>
     <ClInclude Include="ObbCollisionDemo.h">
       <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="GetMultiBoneDemo.h">
+      <Filter>DirectCompute</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
