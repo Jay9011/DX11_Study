@@ -7,8 +7,8 @@ struct VertexMesh
     float2 Uv : Uv;
     float3 Normal : Normal;
     
-    matrix Transform : InstTransform;
-    uint InstanceID : SV_InstanceID;
+    matrix Transform : Inst1_Transform;
+    float4 Color : Inst2_Color;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@ output.Position = WorldPosition(input.Position);\
 output.Position = ViewProjection(output.Position);\
 output.Normal = WorldNormal(input.Normal);\
 output.Uv = input.Uv;\
+output.Color = input.Color;\
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -50,9 +51,9 @@ struct VertexModel
     float4 BlendIndices : BlendIndices;
     float4 BlendWeights : BlendWeights;
     
-    matrix Transform : Inst1_Transform;
     uint InstanceID : SV_InstanceID;
     
+    matrix Transform : Inst1_Transform;
     float4 Color : Inst2_Color;
 };
 
