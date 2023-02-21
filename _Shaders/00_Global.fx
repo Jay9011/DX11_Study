@@ -96,11 +96,11 @@ struct VertexTextureNormal
 struct MeshOutput
 {
     float4 Position : SV_Position0; //Rasterizing Position
-    float3 oPosition : Position1; //Original Position
-    float3 wPosition : Position2; //World Position
+    float3 oPosition : Position1;   //Original Position
+    float3 wPosition : Position2;   //World Position
     float4 wvpPosition : Position3; //WVP
     float4 wvpPosition_Sub : Position4; //WVP
-    float4 sPosition : Position5; //Light WVP
+    float4 sPosition : Position5;       //Light WVP
     
     float3 Normal : Normal;
     float3 Tangent : Tangent;
