@@ -5,9 +5,12 @@
 float4 PS(MeshOutput input) : SV_Target
 {
     Texture(Material.Diffuse, DiffuseMap, input.Uv);
+    Texture(Material.Specular, SpecularMap, input.Uv);
 
     MaterialDesc output;
-    ComputeLight(output, input.Normal, input.wPosition);    // Ambient, Diffuse 계산
+    ComputeLight(output, input.Normal, input.wPosition);    // Ambient, Diffuse, Specular 계산
+
+    return float4(MaterialToColor(output), 1.0f);
 }
 
 technique11 T0
