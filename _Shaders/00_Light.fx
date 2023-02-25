@@ -43,7 +43,7 @@ MaterialDesc MakeMaterial()
 
 float3 MaterialToColor(MaterialDesc result)
 {
-    return (result.Ambient + result.Diffuse + result.Specular).rgb;
+    return (result.Ambient + result.Diffuse + result.Specular + result.Emissive).rgb;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -86,5 +86,14 @@ void ComputeLight(out MaterialDesc output, float3 normal, float3 wPosition)
             float specular = pow(RdotE, Material.Specular.a);
             output.Specular = Material.Specular * specular * GlobalLight.Specular;
         }
+    }
+    
+    [flatten]
+    if(Material.Emissive.a > 0.0f)
+    {
+        float NdotE = dot(E, normalize(normal));
+        float emissive = smoothstep(1.0f - Material.Emissive, 1.0f, 1.0f - saturate(NdotE));
+        
+        output.Emissive = Material.Emissive * emissive;
     }
 }
