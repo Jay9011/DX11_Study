@@ -1,4 +1,5 @@
 #pragma once
+
 class PerFrame
 {
 public:
@@ -34,6 +35,14 @@ private:
 		float Padding2;
 	} lightDesc;
 
+	struct PointLightDesc
+	{
+		UINT Count = 0;
+		float Padding[3];
+
+		PointLight Lights[MAX_POINT_LIGHTS];
+	} pointLightDesc;
+
 private:
 	Shader* shader;
 
@@ -42,5 +51,7 @@ private:
 
 	ConstantBuffer* lightBuffer;
 	ID3DX11EffectConstantBuffer* sLightBuffer;
-};
 
+	ConstantBuffer* pointLightBuffer;
+	ID3DX11EffectConstantBuffer* sPointLightBuffer;
+};

@@ -46,6 +46,15 @@ float3 MaterialToColor(MaterialDesc result)
     return (result.Ambient + result.Diffuse + result.Specular + result.Emissive).rgb;
 }
 
+void AddMaterial(inout MaterialDesc result, MaterialDesc val)
+{
+    result.Ambient += val.Ambient;
+    result.Diffuse += val.Diffuse;
+    result.Specular += val.Specular;
+    result.Emissive += val.Emissive;
+}
+
+
 /////////////////////////////////////////////////////////////////////
 
 void Texture(inout float4 color, Texture2D t, float2 uv, SamplerState samp)
@@ -92,7 +101,7 @@ void ComputeLight(out MaterialDesc output, float3 normal, float3 wPosition)
     if(Material.Emissive.a > 0.0f)
     {
         float NdotE = dot(E, normalize(normal));
-        float emissive = smoothstep(1.0f - Material.Emissive, 1.0f, 1.0f - saturate(NdotE));
+        float emissive = smoothstep(1.0f - Material.Emissive.a, 1.0f, 1.0f - saturate(NdotE));
         
         output.Emissive = Material.Emissive * emissive;
     }
@@ -115,7 +124,7 @@ struct PointLight
     float3 Padding;
 };
 
-cbuffer CB_PointLight
+cbuffer CB_PointLights
 {
     uint PointLightCount;
     float3 CB_PointLights_Padding;
@@ -154,7 +163,7 @@ void ComputhPointLight(inout MaterialDesc output, float3 normal, float3 wPositio
             [flatten]
             if (Material.Specular.a > 0.0f)
             {
-                float3 R = normalize(reflect(-direction, normal));
+                float3 R = normalize(reflect(-light, normal));
                 float RdotE = saturate(dot(R, E));
 
                 float specular = pow(RdotE, Material.Specular.a);
