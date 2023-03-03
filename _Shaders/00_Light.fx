@@ -175,7 +175,7 @@ void ComputhPointLight(inout MaterialDesc output, float3 normal, float3 wPositio
         if (Material.Emissive.a > 0.0f)
         {
             float NdotE = dot(E, normalize(normal));
-            float emissive = smoothstep(1.0f - Material.Emissive, 1.0f, 1.0f - saturate(NdotE));
+            float emissive = smoothstep(1.0f - Material.Emissive.a, 1.0f, 1.0f - saturate(NdotE));
         
             result.Emissive = Material.Emissive * emissive * PointLights[i].Emissive;
         }
@@ -263,7 +263,7 @@ void ComputhSpotLight(inout MaterialDesc output, float3 normal, float3 wPosition
         if (Material.Emissive.a > 0.0f)
         {
             float NdotE = dot(E, normalize(normal));
-            float emissive = smoothstep(1.0f - Material.Emissive, 1.0f, 1.0f - saturate(NdotE));
+            float emissive = smoothstep(1.0f - Material.Emissive.a, 1.0f, 1.0f - saturate(NdotE));
         
             result.Emissive = Material.Emissive * emissive * SpotLights[i].Emissive;
         }
@@ -277,4 +277,34 @@ void ComputhSpotLight(inout MaterialDesc output, float3 normal, float3 wPosition
         output.Emissive += result.Emissive * att;
     }
 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///     Normal Mapping
+///////////////////////////////////////////////////////////////////////////////
+void NormalMapping(float2 uv, float3 normal, float3 tangent, SamplerState samp)
+{
+    float4 map = NormalMap.Sample(samp, uv);
+
+    [flatten]
+    if (any(map.rgb) == false)
+        return;
+
+    float3 coord = map.rgb * 2.0f - 1.0f; // 0~1 까지의 값을 -1~1 까지의 값으로 변환
+
+    // Tangent 공간 생성
+    float3 N = normalize(normal); // Z 축
+    float3 T = normalize(tangent - dot(tangent, N) * N); // X 축
+    float3 B = cross(N, T);         // Y 축
+    
+    float3x3 TBN = float3x3(T, B, N);
+    
+    coord = mul(coord, TBN);
+
+    Material.Diffuse *= saturate(dot(-GlobalLight.Direction, coord));
+}
+
+void NormalMapping(float2 uv, float3 normal, float3 tangent)
+{
+    NormalMapping(uv, normal, tangent, LinearSampler);
 }
