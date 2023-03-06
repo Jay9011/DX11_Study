@@ -114,6 +114,9 @@
     <ClCompile Include="NormalMappingDemo.cpp">
       <Filter>Lighting</Filter>
     </ClCompile>
+    <ClCompile Include="BillboardDemo.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -228,6 +231,9 @@
     </ClInclude>
     <ClInclude Include="NormalMappingDemo.h">
       <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardDemo.h">
+      <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

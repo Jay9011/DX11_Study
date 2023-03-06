@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "BillboardDemo.h"
 #include "NormalMappingDemo.h"
 #include "SpotLightingDemo.h"
 #include "PointLightingDemo.h"
@@ -9,7 +10,8 @@
 
 void Main::Initialize()
 {
-	Push(new NormalMappingDemo());
+	Push(new BillboardDemo());
+	//Push(new NormalMappingDemo());
 	//Push(new SpotLightingDemo());
 	//Push(new PointLightingDemo());
 	//Push(new LightingDemo());
