@@ -117,6 +117,9 @@
     <ClCompile Include="BillboardDemo.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
+    <ClCompile Include="WeatherDemo.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -234,6 +237,9 @@
     </ClInclude>
     <ClInclude Include="BillboardDemo.h">
       <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherDemo.h">
+      <Filter>Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "WeatherDemo.h"
 #include "BillboardDemo.h"
 #include "NormalMappingDemo.h"
 #include "SpotLightingDemo.h"
@@ -10,7 +11,8 @@
 
 void Main::Initialize()
 {
-	Push(new BillboardDemo());
+	Push(new WeatherDemo());
+	// Push(new BillboardDemo());
 	//Push(new NormalMappingDemo());
 	//Push(new SpotLightingDemo());
 	//Push(new PointLightingDemo());

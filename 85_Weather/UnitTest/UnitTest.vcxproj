@@ -209,6 +209,7 @@
     <ClCompile Include="VertexLine.cpp" />
     <ClCompile Include="VertexLine2.cpp" />
     <ClCompile Include="ViewportDemo.cpp" />
+    <ClCompile Include="WeatherDemo.cpp" />
     <ClCompile Include="WorldDemo.cpp" />
     <ClCompile Include="WorldDemo2.cpp" />
     <ClCompile Include="WorldDemo3.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="VertexLine.h" />
     <ClInclude Include="VertexLine2.h" />
     <ClInclude Include="ViewportDemo.h" />
+    <ClInclude Include="WeatherDemo.h" />
     <ClInclude Include="WorldDemo.h" />
     <ClInclude Include="WorldDemo2.h" />
     <ClInclude Include="WorldDemo3.h" />

@@ -26,6 +26,7 @@ Rain::Rain(Vector3& extent, UINT count, wstring file)
 		position.y = Math::Random(-desc.Extent.y, desc.Extent.y);
 		position.z = Math::Random(-desc.Extent.z, desc.Extent.z);
 
+		
 		vertices[i + 0].Position = position;
 		vertices[i + 1].Position = position;
 		vertices[i + 2].Position = position;
@@ -55,6 +56,7 @@ Rain::Rain(Vector3& extent, UINT count, wstring file)
 
 	vertexBuffer = new VertexBuffer(vertices, drawCount * 4, sizeof(VertexRain));
 	indexBuffer = new IndexBuffer(indices, drawCount * 6);
+	
 }
 
 Rain::~Rain()
@@ -86,5 +88,9 @@ void Rain::Render()
 	buffer->Render();
 	sBuffer->SetConstantBuffer(buffer->Buffer());
 
-	shader->DrawIndexed(0, Pass(), drawCount * 6);
+	static UINT pass = 0;
+	ImGui::InputInt("Rain Pass", (int*)&pass);
+	pass %= 2;
+
+	shader->DrawIndexed(0, pass, drawCount * 6);
 }
