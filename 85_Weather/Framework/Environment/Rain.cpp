@@ -90,7 +90,7 @@ void Rain::Render()
 
 	static UINT pass = 0;
 	ImGui::InputInt("Rain Pass", (int*)&pass);
-	pass %= 2;
+	pass %= 4;
 
 	shader->DrawIndexed(0, pass, drawCount * 6);
 }

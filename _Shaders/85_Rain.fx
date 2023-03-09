@@ -9,10 +9,9 @@ cbuffer CB_Rain
     float DrawDistance;
 
     float3 Origin;
-    float Padding;
+    float CB_Rain_Padding;
 
     float3 Extent;
-    float Padding2;
 };
 
 struct VertexInput
@@ -26,6 +25,7 @@ struct VertexOutput
 {
     float4 Position : SV_Position;
     float2 Uv : Uv;
+    float Alpha : Alpha;
 };
 
 VertexOutput VS(VertexInput input)
@@ -52,6 +52,9 @@ VertexOutput VS(VertexInput input)
     output.Position = ViewProjection(position);
     output.Uv = input.Uv;
     
+    float4 view = mul(position, View);
+    output.Alpha = saturate(1 - view.z / DrawDistance) * 0.5f;
+    
     return output;
 }
 
@@ -69,7 +72,8 @@ float4 PS(VertexOutput input) : SV_Target
 {
     float4 diffuse = DiffuseMap.Sample(LinearSampler, input.Uv);
 
-    diffuse.rgb *= Color.rgb;
+    diffuse.rgb = Color.rgb * input.Alpha * 2.0f;
+    diffuse.a = diffuse.a * input.Alpha * 1.5f;
 
     return diffuse;
 }
@@ -79,4 +83,7 @@ technique11 T0
     // P_VP(P0, VS, PS_Discard)
     P_BS_VP(P0, AlphaBlend, VS, PS)
     P_BS_VP(P1, AlphaBlend_AlphaToCoverageEnable, VS, PS)
+
+    P_BS_VP(P2, AdditiveBlend, VS, PS)
+    P_BS_VP(P3, AdditiveBlend_AlphaToCoverageEnable, VS, PS)
 }
