@@ -34,7 +34,15 @@ private:
 
 	CubeSky* sky;
 
+	enum class WeatherType
+	{
+		None = 0,
+		Rain, Snow,
+		Count
+	} weatherType;
+
 	Rain* rain;
+	Snow* snow;
 
 	Material* floor;
 	Material* stone;

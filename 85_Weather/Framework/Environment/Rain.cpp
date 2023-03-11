@@ -73,7 +73,7 @@ void Rain::Update()
 {
 	Super::Update();
 	
-	// Context::Get()->GetCamera()->Position(&desc.Origin);
+	Context::Get()->GetCamera()->Position(&desc.Origin);
 	ImGui::SliderFloat3("Origin", desc.Origin, 0, 200);
 
 	ImGui::SliderFloat3("Velocity", desc.Velocity, -200, 200);

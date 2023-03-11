@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Environment\CubeSky.cpp" />
     <ClCompile Include="Environment\Rain.cpp" />
+    <ClCompile Include="Environment\Snow.cpp" />
     <ClCompile Include="Environment\Terrain.cpp" />
     <ClCompile Include="Meshes\Mesh.cpp" />
     <ClCompile Include="Meshes\MeshCube.cpp" />
@@ -74,6 +75,7 @@
   <ItemGroup>
     <ClInclude Include="Environment\CubeSky.h" />
     <ClInclude Include="Environment\Rain.h" />
+    <ClInclude Include="Environment\Snow.h" />
     <ClInclude Include="Environment\Terrain.h" />
     <ClInclude Include="Meshes\Mesh.h" />
     <ClInclude Include="Meshes\MeshCube.h" />

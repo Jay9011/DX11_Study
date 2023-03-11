@@ -112,3 +112,4 @@ typedef D3DXPLANE Plane;
 #include "Environment/Terrain.h"
 #include "Environment/CubeSky.h"
 #include "Environment/Rain.h"
+#include "Environment/Snow.h"
