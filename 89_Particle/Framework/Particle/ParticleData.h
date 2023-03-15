@@ -1,6 +1,8 @@
 #pragma once
 #include "Framework.h"
 
+#include "Utilities/Xml.h"
+
 struct ParticleData
 {
 	enum class BlendType
@@ -41,4 +43,6 @@ struct ParticleData
 
 	float MinEndSize = 100;
 	float MaxEndSize = 100;
+	bool bLoop;
+	float ColorAmount;
 };

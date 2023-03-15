@@ -11,6 +11,8 @@ void Viewer::Initialize()
 
     sky = new CubeSky(L"Environment/GrassCube1024.dds");
 
+	particleSystem = new ParticleSystem(L"Fire");
+
 	Mesh();
 
 }

@@ -50,6 +50,17 @@ D3DXVECTOR3 Math::RandomVec3(float r1, float r2)
 	return result;
 }
 
+D3DXVECTOR4 Math::RandomVec4(float r1, float r2)
+{
+	D3DXVECTOR4 result;
+	result.x = Random(r1, r2);
+	result.y = Random(r1, r2);
+	result.z = Random(r1, r2);
+	result.w = Random(r1, r2);
+
+	return result;
+}
+
 D3DXCOLOR Math::RandomColor3()
 {
 	D3DXCOLOR result;
@@ -78,6 +89,12 @@ float Math::Clamp(float value, float min, float max)
 	value = value < min ? min : value;
 
 	return value;
+}
+
+float Math::Lerp(float value1, float value2, float t)
+{
+	// return (1 - t) * value1 + t * value2;
+	return value1 + (value2 - value1) * t;
 }
 
 void Math::LerpMatrix(OUT D3DXMATRIX & out, const D3DXMATRIX & m1, const D3DXMATRIX & m2, float amount)
