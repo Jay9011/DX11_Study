@@ -97,6 +97,94 @@ void ParticleSystem::Add(const Vector3& position)
 	leadCount = count;
 }
 
+void ParticleSystem::Update()
+{
+	Super::Update();
+
+	currentTime += Time::Delta();
+
+	MapVertices();
+	Activate();
+	Deactivate();
+}
+
+void ParticleSystem::MapVertices()
+{
+	if(gpuCount == leadCount) return;
+
+	D3D11_MAPPED_SUBRESOURCE subResource;
+
+	if(leadCount > gpuCount)
+	{
+		D3D::GetDC()->Map(vertexBuffer->Buffer(), 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &subResource);
+		{
+			UINT start = gpuCount * 4;
+			UINT size = (leadCount - gpuCount) * sizeof(VertexParticle) * 4;
+			UINT offset = gpuCount * sizeof(VertexParticle) * 4;
+
+			BYTE* p = static_cast<BYTE*>(subResource.pData) + offset;
+			memcpy(p, vertices + start, size);
+		}
+		D3D::GetDC()->Unmap(vertexBuffer->Buffer(), 0);
+	}
+	else
+	{
+		D3D::GetDC()->Map(vertexBuffer->Buffer(), 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &subResource);
+		{
+			UINT start = gpuCount * 4;
+			UINT size = (data.MaxParticles - gpuCount) * sizeof(VertexParticle) * 4;
+			UINT offset = gpuCount * sizeof(VertexParticle) * 4;
+
+			BYTE* p = static_cast<BYTE*>(subResource.pData) + offset;
+			memcpy(p, vertices + start, size);
+		}
+
+		if(leadCount > 0)
+		{
+			UINT size = leadCount * sizeof(VertexParticle) * 4;
+
+			memcpy(subResource.pData, vertices, size);
+		}
+
+		D3D::GetDC()->Unmap(vertexBuffer->Buffer(), 0);
+	}
+
+	gpuCount = leadCount;
+}
+
+void ParticleSystem::Activate()
+{
+	while(activeCount != gpuCount)
+	{
+		float age = currentTime - vertices[activeCount * 4].Time;
+
+		if(age < data.ReadyTime)
+			return;
+
+		vertices[activeCount * 4].Time = currentTime;
+		activeCount++;
+
+		if(activeCount >= data.MaxParticles)
+			activeCount = 0;
+	}
+}
+
+void ParticleSystem::Deactivate()
+{
+	while(activeCount != deactiveCount)
+	{
+		float age = currentTime - vertices[deactiveCount * 4].Time;
+
+		if(age > data.ReadyTime)
+			return;
+
+		deactiveCount++;
+
+		if(deactiveCount >= data.MaxParticles)
+			deactiveCount = 0;
+	}
+}
+
 void ParticleSystem::ReadFile(wstring file)
 {
 	Xml::XMLDocument* document = new Xml::XMLDocument();

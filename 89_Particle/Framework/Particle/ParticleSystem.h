@@ -4,10 +4,18 @@ class ParticleSystem : public Renderer
 {
 public:
 	ParticleSystem(wstring filename);
-	~ParticleSystem();
+	virtual ~ParticleSystem() override;
 
 	void Reset();
 	void Add(const Vector3& position);
+
+public:
+	void Update();
+
+private:
+	void MapVertices();
+	void Activate();
+	void Deactivate();
 
 private:
 	void ReadFile(wstring file);
