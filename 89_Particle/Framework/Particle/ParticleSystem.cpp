@@ -106,6 +106,23 @@ void ParticleSystem::Update()
 	MapVertices();
 	Activate();
 	Deactivate();
+
+	if (activeCount == leadCount)
+		currentTime = 0.0f;
+
+	desc.MinColor = data.MinColor;
+	desc.MaxColor = data.MaxColor;
+	desc.ColorAmount = data.ColorAmount;
+
+	desc.Gravity = data.Gravity;
+	desc.EndVelocity = data.EndVelocity;
+
+	desc.RotateSpeed = Vector2(data.MinRotateSpeed, data.MaxRotateSpeed);
+	desc.StartSize = Vector2(data.MinStartSize, data.MaxStartSize);
+	desc.EndSize = Vector2(data.MinEndSize, data.MaxEndSize);
+
+	desc.ReadyTime = data.ReadyTime;
+	desc.ReadyRandomTime = data.ReadyRandomTime;
 }
 
 void ParticleSystem::MapVertices()
@@ -182,6 +199,35 @@ void ParticleSystem::Deactivate()
 
 		if(deactiveCount >= data.MaxParticles)
 			deactiveCount = 0;
+	}
+}
+
+void ParticleSystem::Render()
+{
+	Super::Render();
+
+	desc.CurrentTime = currentTime;
+
+	buffer->Render();
+	sBuffer->SetConstantBuffer(buffer->Buffer());
+
+	sMap->SetResource(map->SRV());
+
+	
+	if (leadCount == activeCount) 
+		return;
+
+	UINT pass = (UINT)data.Type;
+	if (leadCount > activeCount)
+	{
+		shader->DrawIndexed(0, pass, (leadCount - activeCount) * 6, activeCount * 6);
+	}
+	else
+	{
+		shader->DrawIndexed(0, pass, (data.MaxParticles - activeCount) * 6, activeCount * 6);
+
+		if (leadCount > 0)
+			shader->DrawIndexed(0, pass, leadCount * 6);
 	}
 }
 

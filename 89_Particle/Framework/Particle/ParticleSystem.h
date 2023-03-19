@@ -18,6 +18,9 @@ private:
 	void Deactivate();
 
 private:
+	void Render();
+
+private:
 	void ReadFile(wstring file);
 
 private:
