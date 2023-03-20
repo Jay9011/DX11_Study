@@ -28,6 +28,30 @@ void Viewer::Update()
 
 	sphere->Update();
 	grid->Update();
+
+	Vector3 position;
+	sphere->GetTransform(0)->Position(&position);
+
+	if (Keyboard::Get()->Press('L'))
+		position.x += 20 * Time::Delta();
+	else if (Keyboard::Get()->Press('J'))
+		position.x -= 20 * Time::Delta();
+
+	if (Keyboard::Get()->Press('I'))
+		position.z += 20 * Time::Delta();
+	else if (Keyboard::Get()->Press('K'))
+		position.z -= 20 * Time::Delta();
+
+	if (Keyboard::Get()->Press('O'))
+		position.y += 20 * Time::Delta();
+	else if (Keyboard::Get()->Press('U'))
+		position.y -= 20 * Time::Delta();
+
+	sphere->GetTransform(0)->Position(position);
+	sphere->UpdateTransforms();
+
+	particleSystem->Add(position);
+	particleSystem->Update();
 }
 
 void Viewer::Render()
@@ -39,6 +63,8 @@ void Viewer::Render()
 
 	floor->Render();
 	grid->Render();
+
+	particleSystem->Render();
 }
 
 void Viewer::Mesh()

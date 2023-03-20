@@ -42,16 +42,16 @@ struct VertexOutput
     float2 Uv : Uv;
 };
 
-float ComputePosition(float3 position, float3 velocity, float age, float normalizedAge)
+float4 ComputePosition(float3 position, float3 velocity, float age, float normalizedAge)
 {
     float start = length(velocity); // ¼Óµµ
     float end = start * Particle.EndVelocity;
-
-    float amount = start * normalizedAge + (end - start) * normalizedAge * 0.5;
-
+    
+    float amount = start * normalizedAge + (end - start) * normalizedAge * 0.5f;
+    
     position += normalize(velocity) * amount * Particle.ReadyTime;
     position += Particle.Gravity * age * normalizedAge;
-
+    
     return ViewProjection(float4(position, 1));
 }
 
@@ -59,8 +59,26 @@ float ComputeSize(float value, float normalizedAge)
 {
     float start = lerp(Particle.StartSize.x, Particle.StartSize.y, value);
     float end = lerp(Particle.EndSize.x, Particle.EndSize.y, value);
-
+    
     return lerp(start, end, normalizedAge);
+}
+
+float2x2 ComputeRotation(float value, float age)
+{
+    float angle = lerp(Particle.RotateSpeed.x, Particle.RotateSpeed.y, value);
+    float radian = angle * age;
+    
+    float c = cos(radian);
+    float s = sin(radian);
+    
+    return float2x2(c, -s, s, c);
+}
+
+float4 ComputeColor(float value, float normalizedAge)
+{
+    float4 color = lerp(Particle.MinColor, Particle.MaxColor, value) * normalizedAge;
+    
+    return color * Particle.ColorAmount;
 }
 
 
@@ -76,25 +94,23 @@ VertexOutput VS(VertexInput input)
     output.Position = ComputePosition(input.Position.xyz, input.Velocity, age, normalizedAge);
 
     float size = ComputeSize(input.Random.y, normalizedAge);
+    float2x2 rotation = ComputeRotation(input.Random.z, age);
+
+    output.Position.xy += mul(input.Corner, rotation) * size * 0.5f;
+    output.Uv = (input.Corner + 1.0f) * 0.5f;
+    output.Color = ComputeColor(input.Random.w, normalize(age));
     
     return output;
 }
 
 float4 PS(VertexOutput input) : SV_Target
 {
-    float4 diffuse = DiffuseMap.Sample(LinearSampler, input.Uv);
-
-    diffuse.rgb = Color.rgb * input.Alpha * 2.0f;
-    diffuse.a = diffuse.a * input.Alpha * 1.5f;
-
-    return diffuse;
+    return ParticleMap.Sample(LinearSampler, input.Uv) * input.Color;
 }
 
 technique11 T0
 {
-    P_BS_VP(P0, AlphaBlend, VS, PS)
-    P_BS_VP(P1, AlphaBlend_AlphaToCoverageEnable, VS, PS)
-
-    P_BS_VP(P2, AdditiveBlend, VS, PS)
-    P_BS_VP(P3, AdditiveBlend_AlphaToCoverageEnable, VS, PS)
+    P_BS_VP(P0, OpaqueBlend, VS, PS)
+    P_BS_VP(P1, AdditiveBlend_Particle, VS, PS)
+    P_BS_VP(P2, AlphaBlend, VS, PS)
 }

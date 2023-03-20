@@ -3,7 +3,6 @@
 
 #include "Utilities/Xml.h"
 
-
 ParticleSystem::ParticleSystem(wstring filename)
 	: Renderer(L"89_Particle.fx")
 {
@@ -243,12 +242,12 @@ void ParticleSystem::ReadFile(wstring file)
 	data.Type = (ParticleData::BlendType)node->IntText();
 	
 	node = node->NextSiblingElement();
+	data.bLoop = node->BoolText();
+
+	node = node->NextSiblingElement();
 	wstring textureFile = String::ToWString(node->GetText());
 	data.TextureFile = L"Particles/" + textureFile;
 	map = new Texture(data.TextureFile);
-
-	node = node->NextSiblingElement();
-	data.bLoop = node->BoolText();
 
 	node = node->NextSiblingElement();
 	data.MaxParticles = node->IntText();

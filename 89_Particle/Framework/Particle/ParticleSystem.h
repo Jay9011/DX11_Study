@@ -11,14 +11,12 @@ public:
 
 public:
 	void Update();
+	void Render();
 
 private:
 	void MapVertices();
 	void Activate();
 	void Deactivate();
-
-private:
-	void Render();
 
 private:
 	void ReadFile(wstring file);
@@ -50,6 +48,7 @@ private:
 
 		float ColorAmount;
 		float CurrentTime;
+
 		float Padding[2];
 	} desc;
 

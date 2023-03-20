@@ -11,10 +11,13 @@ struct ParticleData
 		Additive,
 		AlphaBlend
 	} Type = BlendType::Opaque;
-
+	
 	wstring TextureFile;
 
 	UINT MaxParticles = 100;
+
+
+	bool bLoop = false;
 
 	float ReadyTime = 1.0f;
 	float ReadyRandomTime = 0;
@@ -35,6 +38,8 @@ struct ParticleData
 	Color MinColor = Color(1, 1, 1, 1);
 	Color MaxColor = Color(1, 1, 1, 1);
 
+	float ColorAmount = 1.0f;
+
 	float MinRotateSpeed = 0;
 	float MaxRotateSpeed = 0;
 
@@ -43,6 +48,4 @@ struct ParticleData
 
 	float MinEndSize = 100;
 	float MaxEndSize = 100;
-	bool bLoop;
-	float ColorAmount;
 };
