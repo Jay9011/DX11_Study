@@ -66,8 +66,20 @@ void ParticleSystem::Add(const Vector3& position)
 
 	UINT count = leadCount + 1;
 
+
 	if(count >= data.MaxParticles)
-		count = 0;
+	{
+		if(data.bLoop)
+		{
+			count = 0;
+		}
+		else
+		{
+			count = data.MaxParticles;
+
+			return;
+		}
+	}
 
 	if(count == deactiveCount)
 		return;
@@ -181,7 +193,7 @@ void ParticleSystem::Activate()
 		activeCount++;
 
 		if(activeCount >= data.MaxParticles)
-			activeCount = 0;
+			activeCount = data.bLoop ? 0 : data.MaxParticles;
 	}
 }
 
@@ -197,7 +209,7 @@ void ParticleSystem::Deactivate()
 		deactiveCount++;
 
 		if(deactiveCount >= data.MaxParticles)
-			deactiveCount = 0;
+			deactiveCount = data.bLoop ? 0 : data.MaxParticles;
 	}
 }
 

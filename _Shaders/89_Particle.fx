@@ -110,7 +110,7 @@ float4 PS(VertexOutput input) : SV_Target
 
 technique11 T0
 {
-    P_BS_VP(P0, OpaqueBlend, VS, PS)
-    P_BS_VP(P1, AdditiveBlend_Particle, VS, PS)
-    P_BS_VP(P2, AlphaBlend, VS, PS)
+    P_DSS_BS_VP(P0, DepthRead_Particle, OpaqueBlend, VS, PS)
+    P_DSS_BS_VP(P1, DepthRead_Particle, AdditiveBlend_Particle, VS, PS)
+    P_DSS_BS_VP(P2, DepthRead_Particle, AlphaBlend, VS, PS)
 }
