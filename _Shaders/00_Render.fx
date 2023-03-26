@@ -132,13 +132,6 @@ cbuffer CB_TweenFrame
     TweenFrame TweenFrames[MAX_MODEL_INSTANCE];
 };
 
-struct VertexOutput
-{
-    float4 Position : SV_Position;
-    float3 Normal : Normal;
-    float2 Uv : Uv;
-};
-
 void SetTweenWorld(inout matrix world, VertexModel input)
 {
     float indices[4] = { input.BlendIndices.x, input.BlendIndices.y, input.BlendIndices.z, input.BlendIndices.w };

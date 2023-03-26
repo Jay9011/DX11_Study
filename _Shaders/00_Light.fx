@@ -132,7 +132,7 @@ cbuffer CB_PointLights
     PointLight PointLights[MAX_POINT_LIGHTS];
 };
 
-void ComputhPointLight(inout MaterialDesc output, float3 normal, float3 wPosition)
+void ComputePointLight(inout MaterialDesc output, float3 normal, float3 wPosition)
 {
     output = MakeMaterial();
     MaterialDesc result = MakeMaterial();
@@ -221,7 +221,7 @@ cbuffer CB_SpotLights
     SpotLight SpotLights[MAX_SPOT_LIGHTS];
 };
 
-void ComputhSpotLight(inout MaterialDesc output, float3 normal, float3 wPosition)
+void ComputeSpotLight(inout MaterialDesc output, float3 normal, float3 wPosition)
 {
     output = MakeMaterial();
     MaterialDesc result = MakeMaterial();
@@ -307,4 +307,30 @@ void NormalMapping(float2 uv, float3 normal, float3 tangent, SamplerState samp)
 void NormalMapping(float2 uv, float3 normal, float3 tangent)
 {
     NormalMapping(uv, normal, tangent, LinearSampler);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///     
+///////////////////////////////////////////////////////////////////////////////
+
+float4 PS_AllLight(MeshOutput input)
+{
+    NormalMapping(input.Uv, input.Normal, input.Tangent);
+    
+    Texture(Material.Diffuse, DiffuseMap, input.Uv);
+    Texture(Material.Specular, SpecularMap, input.Uv);
+    
+    MaterialDesc output = MakeMaterial();
+    MaterialDesc result = MakeMaterial();
+    
+    ComputeLight(output, input.Normal, input.wPosition);
+    AddMaterial(result, output);
+    
+    ComputePointLight(output, input.Normal, input.wPosition);
+    AddMaterial(result, output);
+    
+    ComputeSpotLight(output, input.Normal, input.wPosition);
+    AddMaterial(result, output);
+    
+    return float4(MaterialToColor(result).rgb, 1.0f);
 }
