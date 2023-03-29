@@ -93,15 +93,34 @@ void BillboardDemo::Render()
 void BillboardDemo::Billboards()
 {
 	billboard = new Billboard(shader);
-	billboard->Pass(3);
-	billboard->SetTexture(L"Terrain/grass_14.tga");
+	// billboard->Pass(3);
+	billboard->Pass(4);
+	billboard->AddTexture(L"Terrain/grass_14.tga");
+	billboard->AddTexture(L"Terrain/grass_07.tga");
+	billboard->AddTexture(L"Terrain/grass_11.tga");
 
 	for (UINT i = 0; i < 1200; i++)
 	{
 		Vector2 scale = Math::RandomVec2(1, 3);
 		Vector2 position = Math::RandomVec2(-60, 60);
 
-		billboard->Add(Vector3(position.x, scale.y * 0.5f, position.y), scale);
+		billboard->Add(Vector3(position.x, scale.y * 0.5f, position.y), scale, 0);
+	}
+
+	for (UINT i = 0; i < 300; i++)
+	{
+		Vector2 scale = Math::RandomVec2(1, 3);
+		Vector2 position = Math::RandomVec2(-60, 60);
+
+		billboard->Add(Vector3(position.x, scale.y * 0.5f, position.y), scale, 1);
+	}
+
+	for (UINT i = 0; i < 700; i++)
+	{
+		Vector2 scale = Math::RandomVec2(1, 3);
+		Vector2 position = Math::RandomVec2(-60, 60);
+
+		billboard->Add(Vector3(position.x, scale.y * 0.5f, position.y), scale, 2);
 	}
 }
 

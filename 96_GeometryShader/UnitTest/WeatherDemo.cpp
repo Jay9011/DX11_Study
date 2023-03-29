@@ -134,7 +134,7 @@ void WeatherDemo::Billboards()
 		Vector2 scale = Math::RandomVec2(1, 3);
 		Vector2 position = Math::RandomVec2(-60, 60);
 
-		billboard->Add(Vector3(position.x, scale.y * 0.5f, position.y), scale);
+		billboard->Add(Vector3(position.x, scale.y * 0.5f, position.y), scale, 0);
 	}
 }
 

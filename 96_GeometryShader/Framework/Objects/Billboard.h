@@ -10,8 +10,8 @@ public:
 	void Update() override;
 	void Render() override;
 
-	void Add(const Vector3& position, const Vector2& scale);
-	void SetTexture(wstring file);
+	void Add(const Vector3& position, const Vector2& scale, UINT mapIndex);
+	void AddTexture(wstring file);
 
 
 private:
@@ -19,12 +19,14 @@ private:
 	{
 		Vector3 Position;
 		Vector2 Scale;
+		UINT MapIndex;
 	};
 
 private:
 	vector<VertexBillboard> vertices;
-	
-	Texture* texture = nullptr;
+
+	vector<wstring> textureNames;
+	TextureArray* textureArray = nullptr;
 	ID3DX11EffectShaderResourceVariable* sDiffuseMap;
 
 };
