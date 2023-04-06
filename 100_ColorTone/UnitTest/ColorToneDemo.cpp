@@ -9,9 +9,12 @@ void ColorToneDemo::Initialize()
 
     shader = new Shader(L"96_Billboard.fx");
 
-	renderTarget = new RenderTarget();
-	depthStencil = new DepthStencil();
-	viewport = new Viewport(D3D::Width(), D3D::Height());
+	UINT width = D3D::Width(), height = D3D::Height();
+	// width = height = 2048;
+
+	renderTarget = new RenderTarget((UINT)width, (UINT)height);
+	depthStencil = new DepthStencil((UINT)width, (UINT)height);
+	viewport = new Viewport(width, height);
 	render2D = new Render2D();
 	render2D->GetTransform()->Scale(355, 200, 1);
 	render2D->GetTransform()->Position(200, 120, 0);
@@ -54,6 +57,20 @@ void ColorToneDemo::Destroy()
 
 void ColorToneDemo::Update()
 {
+	static UINT Pass = postEffect->GetShader()->PassCount() - 1;
+	ImGui::InputInt("ColorTone Pass", (int*)&Pass);
+	Pass %= postEffect->GetShader()->PassCount();
+	postEffect->Pass(Pass);
+
+
+	Vector2 PixelSize = Vector2(1.0f / D3D::Width(), 1.0f / D3D::Height());
+	postEffect->GetShader()->AsVector("PixelSize")->SetFloatVector(PixelSize);
+
+	static float Sharpness = 0.0f;
+	ImGui::InputFloat("Sharpness", &Sharpness, 0.1f);
+	postEffect->GetShader()->AsScalar("Sharpness")->SetFloat(Sharpness);
+
+
 	sky->Update();
 
 	cube->Update();
@@ -81,6 +98,7 @@ void ColorToneDemo::Update()
 void ColorToneDemo::PreRender()
 {
 	renderTarget->PreRender(depthStencil);
+	viewport->RSSetViewport();
 
 	{
 		sky->Render();
