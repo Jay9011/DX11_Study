@@ -66,9 +66,48 @@ void ColorToneDemo::Update()
 	Vector2 PixelSize = Vector2(1.0f / D3D::Width(), 1.0f / D3D::Height());
 	postEffect->GetShader()->AsVector("PixelSize")->SetFloatVector(PixelSize);
 
-	static float Sharpness = 0.0f;
-	ImGui::InputFloat("Sharpness", &Sharpness, 0.1f);
-	postEffect->GetShader()->AsScalar("Sharpness")->SetFloat(Sharpness);
+
+	{
+		static float Saturation = 0.0f;
+		ImGui::InputFloat("Saturation", &Saturation, 0.1f);
+		postEffect->GetShader()->AsScalar("Saturation")->SetFloat(Saturation);
+	}
+
+	{
+		static float Sharpness = 0.0f;
+		ImGui::InputFloat("Sharpness", &Sharpness, 0.1f);
+		postEffect->GetShader()->AsScalar("Sharpness")->SetFloat(Sharpness);
+	}
+
+	{
+		ImGui::Separator();
+
+		static float Power = 1.0f;
+		ImGui::InputFloat("Power", &Power, 0.1f);
+		postEffect->GetShader()->AsScalar("Power")->SetFloat(Power);
+
+		static float ScaleX = 1.0f;
+		ImGui::InputFloat("ScaleX", &ScaleX, 0.1f);
+
+		static float ScaleY = 1.0f;
+		ImGui::InputFloat("ScaleY", &ScaleY, 0.1f);
+		postEffect->GetShader()->AsVector("Scale")->SetFloatVector(Vector2(ScaleX, ScaleY));
+	}
+
+	// Lens Distortion : 오래된 필름처럼 R, G, B 를 분리해내는 느낌
+	{
+		ImGui::Separator();
+
+		static float LensPower = 1.0f;
+		ImGui::InputFloat("LensPower", &LensPower, 0.01f);
+		postEffect->GetShader()->AsScalar("LensPower")->SetFloat(LensPower);
+
+		static Vector3 Distortion = Vector3(-0.02f, -0.02f, -0.02f);
+		ImGui::InputFloat("DistortionX", &Distortion.x, 0.001f);
+		ImGui::InputFloat("DistortionY", &Distortion.y, 0.001f);
+		ImGui::InputFloat("DistortionZ", &Distortion.z, 0.001f);
+		postEffect->GetShader()->AsVector("Distortion")->SetFloatVector(Distortion);
+	}
 
 
 	sky->Update();
