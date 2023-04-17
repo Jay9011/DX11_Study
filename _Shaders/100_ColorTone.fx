@@ -137,6 +137,55 @@ float4 PS_LensDistortion(VertexOutput input) : SV_Target
     return color;
 }
 
+
+float Strength = 1.0f;
+int interaceValue = 2;
+
+float4 PS_Interace(VertexOutput input) : SV_Target
+{
+    float4 color = DiffuseMap.Sample(LinearSampler, input.Uv);
+    float height = 1.0f / PixelSize.y;
+    
+    int value = (int) ((floor(input.Uv.y * height) % interaceValue) / (interaceValue / 2));
+    
+    [flatten]
+    if (value)
+    {
+        float3 grayScale = float3(0.2126f, 0.7152f, 0.0722f);
+        float luminance = dot(color.rgb, grayScale);
+        
+        luminance = min(0.999f, luminance);
+        
+        color.rgb = lerp(color.rgb, color.rgb * luminance, Strength);
+    }
+    return color;
+}
+
+float2 ScaleSourceSize;
+float4 PS_Blur(VertexOutput input) : SV_Target
+{
+    float2 size = 1.0f / ScaleSourceSize;
+    
+    float4 s0 = DiffuseMap.Sample(LinearSampler, input.Uv + float2(-size.x, -size.y));
+    float4 s1 = DiffuseMap.Sample(LinearSampler, input.Uv + float2(+size.x, -size.y));
+    float4 s2 = DiffuseMap.Sample(LinearSampler, input.Uv + float2(-size.x, +size.y));
+    float4 s3 = DiffuseMap.Sample(LinearSampler, input.Uv + float2(+size.x, +size.y));
+    
+    return (s0 + s1 + s2 + s3) / 4;
+}
+
+float2 WiggleOffset = float2(10, 10);
+float2 WiggleAmount = float2(0.01f, 0.01f);
+float4 PS_Wiggle(VertexOutput input) : SV_Target
+{
+    float2 uv = input.Uv;
+    uv.x += sin(Time + uv.x * WiggleOffset.x) * WiggleAmount.x;
+    uv.y += cos(Time + uv.y * WiggleOffset.y) * WiggleAmount.y;
+    
+    return DiffuseMap.Sample(LinearSampler, uv);
+}
+
+
 technique11 T0
 {
     P_VP(P0, VS, PS_Diffuse)
@@ -148,4 +197,7 @@ technique11 T0
     P_VP(P6, VS, PS_Sepia)
     P_VP(P7, VS, PS_Vignette)
     P_VP(P8, VS, PS_LensDistortion)
+    P_VP(P9, VS, PS_Interace)
+    P_VP(P10, VS, PS_Blur)
+    P_VP(P11, VS, PS_Wiggle)
 }

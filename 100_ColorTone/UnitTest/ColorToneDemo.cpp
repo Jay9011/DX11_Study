@@ -109,6 +109,50 @@ void ColorToneDemo::Update()
 		postEffect->GetShader()->AsVector("Distortion")->SetFloatVector(Distortion);
 	}
 
+	//Interace : °¡·ÎÁÙ È¿°ú (¿¾³¯ TV ´À³¦)
+	{
+		ImGui::Separator();
+
+		static float Strength = 1.0f;
+		ImGui::InputFloat("Strength", &Strength, 0.01f);
+		postEffect->GetShader()->AsScalar("Strength")->SetFloat(Strength);
+
+		static int InteraceValue = 2;
+		ImGui::InputInt("InteraceValue", &InteraceValue);
+		postEffect->GetShader()->AsScalar("interaceValue")->SetInt(InteraceValue);
+	}
+
+	//Down Scale : Èå¸²È¿°ú(?)
+	{
+		ImGui::Separator();
+
+		static float ScaleX = D3D::Width();
+		ImGui::InputFloat("DownScaleX", &ScaleX, 1.0f);
+
+		static float ScaleY = D3D::Height();
+		ImGui::InputFloat("DownScaleY", &ScaleY, 1.0f);
+		postEffect->GetShader()->AsVector("ScaleSourceSize")->SetFloatVector(Vector2(ScaleX, ScaleY));
+	}
+
+	//Wiggle : ¿Ö°î È¿°ú
+	{
+		ImGui::Separator();
+
+		static float OffsetX = 10;
+		ImGui::InputFloat("OffsetX", &OffsetX, 0.1f);
+
+		static float OffsetY = 10;
+		ImGui::InputFloat("OffsetY", &OffsetY, 0.1f);
+		postEffect->GetShader()->AsVector("WiggleOffset")->SetFloatVector(Vector2(OffsetX, OffsetY));
+
+		static float AmountX = 0.01f;
+		ImGui::InputFloat("AmountX", &AmountX, 0.001f);
+
+		static float AmountY = 0.01f;
+		ImGui::InputFloat("AmountY", &AmountY, 0.001f);
+		postEffect->GetShader()->AsVector("WiggleAmount")->SetFloatVector(Vector2(AmountX, AmountY));
+	}
+
 
 	sky->Update();
 
@@ -132,6 +176,7 @@ void ColorToneDemo::Update()
 	billboard->Update();
 
 	render2D->Update();
+	postEffect->Update();
 }
 
 void ColorToneDemo::PreRender()
