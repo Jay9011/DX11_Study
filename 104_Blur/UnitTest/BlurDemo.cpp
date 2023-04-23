@@ -12,16 +12,18 @@ void BlurDemo::Initialize()
 	UINT width = D3D::Width(), height = D3D::Height();
 	// width = height = 2048;
 
-	renderTarget = new RenderTarget((UINT)width, (UINT)height);
+	renderTarget[0] = new RenderTarget((UINT)width, (UINT)height);
+	renderTarget[1] = new RenderTarget((UINT)width, (UINT)height);
+	renderTarget[2] = new RenderTarget((UINT)width, (UINT)height);
+
 	depthStencil = new DepthStencil((UINT)width, (UINT)height);
 	viewport = new Viewport(width, height);
 	render2D = new Render2D();
 	render2D->GetTransform()->Scale(355, 200, 1);
 	render2D->GetTransform()->Position(200, 120, 0);
-	render2D->SRV(renderTarget->SRV());
+	render2D->SRV(renderTarget[0]->SRV());
 
 	postEffect = new PostEffect(L"104_Blur.fx");
-	postEffect->SRV(renderTarget->SRV());
 
 
     sky = new CubeSky(L"Environment/GrassCube1024.dds");
@@ -128,7 +130,7 @@ void BlurDemo::Update()
 
 void BlurDemo::PreRender()
 {
-	renderTarget->PreRender(depthStencil);
+	renderTarget[0]->PreRender(depthStencil);
 	viewport->RSSetViewport();
 
 	{
@@ -155,6 +157,26 @@ void BlurDemo::PreRender()
 
 		billboard->Render();
 	}
+
+	//GaussianBlurX
+	{
+		renderTarget[1]->PreRender(depthStencil);
+
+		postEffect->Pass(3);
+		postEffect->SRV(renderTarget[0]->SRV());
+		postEffect->Render();
+	}
+
+	//GaussianBlurY
+	{
+		renderTarget[2]->PreRender(depthStencil);
+
+		postEffect->Pass(4);
+		postEffect->SRV(renderTarget[1]->SRV());
+		postEffect->Render();
+	}
+
+
 }
 
 void BlurDemo::Render()
@@ -166,7 +188,10 @@ void BlurDemo::Render()
 
 void BlurDemo::PostRender()
 {
+	postEffect->Pass(0);
+	postEffect->SRV(renderTarget[2]->SRV());
 	postEffect->Render();
+
 	render2D->Render();
 }
 

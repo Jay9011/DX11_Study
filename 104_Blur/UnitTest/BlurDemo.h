@@ -30,7 +30,7 @@ private:
 private:
 	Shader* shader;
 
-	RenderTarget* renderTarget;
+	RenderTarget* renderTarget[3];
 	DepthStencil* depthStencil;
 	Viewport* viewport;
 	Render2D* render2D;

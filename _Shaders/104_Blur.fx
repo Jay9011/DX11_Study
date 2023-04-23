@@ -20,6 +20,11 @@ VertexOutput VS(float4 Position : Position)
     return output;
 }
 
+float4 PS_Diffuse(VertexOutput input) : SV_Target
+{
+    return DiffuseMap.Sample(LinearSampler, input.Uv);
+}
+
 uint BlurCount = 8;
 float4 PS_Blur(VertexOutput input) : SV_Target
 {
@@ -80,8 +85,57 @@ float4 PS_RadialBlur(VertexOutput input) : SV_Target
 }
 
 
+const int GaussBlurCount = 6;
+static const float Weights[13] =
+{
+    0.0561f, 0.1353f, 0.2780f, 0.4868f, 0.7261f, 0.9231f,
+    1.0f,
+    0.9231f, 0.7261f, 0.4868f, 0.2780f, 0.1353f, 0.0561f
+};
+
+float4 PS_GaussianBlurX(VertexOutput input) : SV_Target
+{
+    float2 uv = input.Uv;
+    float u = PixelSize.x;
+    
+    float sum = 0;
+    float4 color = 0;
+    for (int i = -GaussBlurCount; i <= GaussBlurCount; i++)
+    {
+        float2 temp = uv + float2(u * (float) i, 0.0f);
+        color += Weights[6 + i] * DiffuseMap.Sample(LinearSampler, temp);
+        
+        sum += Weights[6 + i];
+    }
+    color /= sum;
+    
+    return float4(color.rgb, 1.0f);
+}
+
+float4 PS_GaussianBlurY(VertexOutput input) : SV_Target
+{
+    float2 uv = input.Uv;
+    float v = PixelSize.y;
+    
+    float sum = 0;
+    float4 color = 0;
+    for (int i = -GaussBlurCount; i <= +GaussBlurCount; i++)
+    {
+        float2 temp = uv + float2(0.0f, v * (float) i);
+        color += Weights[6 + i] * DiffuseMap.Sample(LinearSampler, temp);
+        
+        sum += Weights[6 + i];
+    }
+    color /= sum;
+    
+    return float4(color.rgb, 1);
+}
+
 technique11 T0
 {
-    P_VP(P0, VS, PS_Blur)
-    P_VP(P1, VS, PS_RadialBlur)
+    P_VP(P0, VS, PS_Diffuse)
+    P_VP(P1, VS, PS_Blur)
+    P_VP(P2, VS, PS_RadialBlur)
+    P_VP(P3, VS, PS_GaussianBlurX)
+    P_VP(P4, VS, PS_GaussianBlurY)
 }
