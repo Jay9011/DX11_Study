@@ -2,6 +2,8 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "GaussianBlurDemo2.h"
+#include "GaussianBlurDemo.h"
 #include "BlurDemo.h"
 #include "MrtDemo.h"
 #include "ColorToneDemo.h"
@@ -14,7 +16,9 @@
 
 void Main::Initialize()
 {
-	Push(new BlurDemo());
+	Push(new GaussianBlurDemo2());
+	// Push(new GaussianBlurDemo());
+	// Push(new BlurDemo());
 	// Push(new MrtDemo());
 	// Push(new ColorToneDemo());
 	// Push(new WeatherDemo());

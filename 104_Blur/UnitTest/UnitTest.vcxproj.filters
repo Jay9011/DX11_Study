@@ -129,6 +129,12 @@
     <ClCompile Include="BlurDemo.cpp">
       <Filter>PostEffects</Filter>
     </ClCompile>
+    <ClCompile Include="GaussianBlurDemo.cpp">
+      <Filter>PostEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="GaussianBlurDemo2.cpp">
+      <Filter>PostEffects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -257,6 +263,12 @@
       <Filter>PostEffects</Filter>
     </ClInclude>
     <ClInclude Include="BlurDemo.h">
+      <Filter>PostEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="GaussianBlurDemo.h">
+      <Filter>PostEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="GaussianBlurDemo2.h">
       <Filter>PostEffects</Filter>
     </ClInclude>
   </ItemGroup>

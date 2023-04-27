@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "BlurDemo.h"
+#include "GaussianBlurDemo.h"
 
-void BlurDemo::Initialize()
+void GaussianBlurDemo::Initialize()
 {
     Context::Get()->GetCamera()->RotationDegree(20, -20, 0);
     Context::Get()->GetCamera()->Position(1, 36, -85);
@@ -12,16 +12,18 @@ void BlurDemo::Initialize()
 	UINT width = D3D::Width(), height = D3D::Height();
 	// width = height = 2048;
 
-	renderTarget = new RenderTarget((UINT)width, (UINT)height);
+	renderTarget[0] = new RenderTarget((UINT)width, (UINT)height);
+	renderTarget[1] = new RenderTarget((UINT)width, (UINT)height);
+	renderTarget[2] = new RenderTarget((UINT)width, (UINT)height);
 
 	depthStencil = new DepthStencil((UINT)width, (UINT)height);
 	viewport = new Viewport(width, height);
 	render2D = new Render2D();
 	render2D->GetTransform()->Scale(355, 200, 1);
 	render2D->GetTransform()->Position(200, 120, 0);
-	render2D->SRV(renderTarget->SRV());
+	render2D->SRV(renderTarget[0]->SRV());
 
-	postEffect = new PostEffect(L"104_Blur.fx");
+	postEffect = new PostEffect(L"104_GaussianBlur.fx");
 
 
     sky = new CubeSky(L"Environment/GrassCube1024.dds");
@@ -38,7 +40,7 @@ void BlurDemo::Initialize()
 	SpotLighting();
 }
 
-void BlurDemo::Destroy()
+void GaussianBlurDemo::Destroy()
 {
     SafeDelete(floor);
     SafeDelete(stone);
@@ -55,52 +57,8 @@ void BlurDemo::Destroy()
 
 }
 
-void BlurDemo::Update()
+void GaussianBlurDemo::Update()
 {
-	static UINT Pass = postEffect->GetShader()->PassCount() - 1;
-	ImGui::InputInt("Blur Pass", (int*)&Pass);
-	Pass %= postEffect->GetShader()->PassCount();
-	postEffect->Pass(Pass);
-
-
-	//Blur
-	{
-		Vector2 PixelSize = Vector2(1.0f / D3D::Width(), 1.0f / D3D::Height());
-		postEffect->GetShader()->AsVector("PixelSize")->SetFloatVector(PixelSize);
-		
-		static UINT BlurCount = 8;
-		ImGui::InputInt("Blur Count", (int*)&BlurCount);
-		postEffect->GetShader()->AsScalar("BlurCount")->SetInt(BlurCount);
-	}
-
-
-	//RadialBlur
-	{
-		ImGui::Separator();
-
-		static UINT BlurCount = 8;
-		ImGui::InputInt("RadialBlurCount", (int *)&BlurCount);
-		BlurCount %= 32;
-		postEffect->GetShader()->AsScalar("RadialBlurCount")->SetInt(BlurCount);
-
-		static float Radius = 0.6f;
-		ImGui::InputFloat("RadialBlurRadius", &Radius, 0.01f);
-		postEffect->GetShader()->AsScalar("RadialBlurRadius")->SetFloat(Radius);
-
-		static float Amount = 0.04f;
-		ImGui::InputFloat("RadialBlurAmount", &Amount, 0.001f);
-		postEffect->GetShader()->AsScalar("RadialBlurAmount")->SetFloat(Amount);
-
-
-		static float CenterX = 0.5f;
-		ImGui::InputFloat("CenterX", &CenterX, 0.01f);
-
-		static float CenterY = 0.5f;
-		ImGui::InputFloat("CenterY", &CenterY, 0.01f);
-		postEffect->GetShader()->AsVector("RadialCenter")->SetFloatVector(Vector2(CenterX, CenterY));
-	}
-
-
 	sky->Update();
 
 	cube->Update();
@@ -126,9 +84,9 @@ void BlurDemo::Update()
 	postEffect->Update();
 }
 
-void BlurDemo::PreRender()
+void GaussianBlurDemo::PreRender()
 {
-	renderTarget->PreRender(depthStencil);
+	renderTarget[0]->PreRender(depthStencil);
 	viewport->RSSetViewport();
 
 	{
@@ -155,25 +113,48 @@ void BlurDemo::PreRender()
 
 		billboard->Render();
 	}
-	
+
+	Vector2 PixelSize = Vector2(1.0f / D3D::Width(), 1.0f / D3D::Height());
+	postEffect->GetShader()->AsVector("PixelSize")->SetFloatVector(PixelSize);
+
+	//GaussianBlurX
+	{
+		renderTarget[1]->PreRender(depthStencil);
+
+		postEffect->Pass(1);
+		postEffect->SRV(renderTarget[0]->SRV());
+		postEffect->Render();
+	}
+
+	//GaussianBlurY
+	{
+		renderTarget[2]->PreRender(depthStencil);
+
+		postEffect->Pass(2);
+		postEffect->SRV(renderTarget[1]->SRV());
+		postEffect->Render();
+	}
+
+
 }
 
-void BlurDemo::Render()
+void GaussianBlurDemo::Render()
 {
 	// if(Keyboard::Get()->Down(VK_SPACE))
 	// 	renderTarget->SaveTexture(L"../RenderTarget.png"	);
 	
 }
 
-void BlurDemo::PostRender()
+void GaussianBlurDemo::PostRender()
 {
-	postEffect->SRV(renderTarget->SRV());
+	postEffect->Pass(0);
+	postEffect->SRV(renderTarget[2]->SRV());
 	postEffect->Render();
 
 	render2D->Render();
 }
 
-void BlurDemo::Billboards()
+void GaussianBlurDemo::Billboards()
 {
 	billboard = new Billboard(shader);
 	// billboard->Pass(3);
@@ -207,7 +188,7 @@ void BlurDemo::Billboards()
 	}
 }
 
-void BlurDemo::Mesh()
+void GaussianBlurDemo::Mesh()
 {
 	{
 		floor = new Material(shader);
@@ -287,7 +268,7 @@ void BlurDemo::Mesh()
 	meshes.push_back(grid);
 }
 
-void BlurDemo::Airplane()
+void GaussianBlurDemo::Airplane()
 {
 	airplane = new ModelRender(shader);
 	airplane->ReadMesh(L"B787/Airplane");
@@ -301,7 +282,7 @@ void BlurDemo::Airplane()
 	models.push_back(airplane);
 }
 
-void BlurDemo::Kachujin()
+void GaussianBlurDemo::Kachujin()
 {
 	kachujin = new ModelAnimator(shader);
 	kachujin->ReadMesh(L"Kachujin/Mesh");
@@ -347,7 +328,7 @@ void BlurDemo::Kachujin()
 	animators.push_back(kachujin);
 }
 
-void BlurDemo::KachujinCollider()
+void GaussianBlurDemo::KachujinCollider()
 {
 	UINT count = kachujin->GetTransformCount();
 	colliders = new ColliderObject * [count];
@@ -371,7 +352,7 @@ void BlurDemo::KachujinCollider()
 	}
 }
 
-void BlurDemo::KachujinWeapon()
+void GaussianBlurDemo::KachujinWeapon()
 {
 	weapon = new ModelRender(shader);
 	weapon->ReadMesh(L"Weapon/Sword");
@@ -390,7 +371,7 @@ void BlurDemo::KachujinWeapon()
 	weaponInitTransform->Rotation(0, 0, 1);
 }
 
-void BlurDemo::PointLighting()
+void GaussianBlurDemo::PointLighting()
 {
 	PointLight light;
 	light =
@@ -434,7 +415,7 @@ void BlurDemo::PointLighting()
 	Lighting::Get()->AddPointLight(light);
 }
 
-void BlurDemo::SpotLighting()
+void GaussianBlurDemo::SpotLighting()
 {
 	SpotLight light;
 	light =
@@ -460,7 +441,7 @@ void BlurDemo::SpotLighting()
 	Lighting::Get()->AddSpotLight(light);
 }
 
-void BlurDemo::Pass(UINT mesh, UINT model, UINT anim)
+void GaussianBlurDemo::Pass(UINT mesh, UINT model, UINT anim)
 {
 	for (MeshRender* temp : meshes)
 		temp->Pass(mesh);

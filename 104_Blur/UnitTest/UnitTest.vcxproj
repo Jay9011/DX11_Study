@@ -171,6 +171,10 @@
     <ClCompile Include="BlurDemo.cpp" />
     <ClCompile Include="CubeDemo.cpp" />
     <ClCompile Include="CubeSkyDemo.cpp" />
+    <ClCompile Include="GaussianBlurDemo.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GaussianBlurDemo2.cpp" />
     <ClCompile Include="GetAnimationBoneDemo.cpp" />
     <ClCompile Include="GetHeightDemo.cpp" />
     <ClCompile Include="GetMultiBoneDemo.cpp" />
@@ -222,6 +226,10 @@
     <ClInclude Include="BlurDemo.h" />
     <ClInclude Include="CubeDemo.h" />
     <ClInclude Include="CubeSkyDemo.h" />
+    <ClInclude Include="GaussianBlurDemo.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="GaussianBlurDemo2.h" />
     <ClInclude Include="GetAnimationBoneDemo.h" />
     <ClInclude Include="GetHeightDemo.h" />
     <ClInclude Include="GetMultiBoneDemo.h" />

@@ -1,7 +1,7 @@
 #pragma once
 #include "Systems/IExecute.h"
 
-class BlurDemo : public IExecute
+class GaussianBlurDemo2 : public IExecute
 {
 public:
     virtual void Initialize() override;
@@ -29,8 +29,8 @@ private:
 
 private:
 	Shader* shader;
-
-	RenderTarget* renderTarget;
+	
+	RenderTarget* renderTarget[3];
 	DepthStencil* depthStencil;
 	Viewport* viewport;
 	Render2D* render2D;
