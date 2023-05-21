@@ -111,6 +111,7 @@ typedef D3DXPLANE Plane;
 #include "Objects/Billboard.h"
 #include "Objects/Collider.h";
 #include "Objects/PostEffect.h"
+#include "Objects/DynamicCubeMap.h"
 
 #include "Environment/Terrain.h"
 #include "Environment/CubeSky.h"

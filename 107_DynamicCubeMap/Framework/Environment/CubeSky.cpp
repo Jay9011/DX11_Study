@@ -1,40 +1,49 @@
 #include "Framework.h"
 #include "CubeSky.h"
 
-CubeSky::CubeSky(wstring file)
+CubeSky::CubeSky(wstring file, Shader* shader)
+	: shader(shader)
 {
-    shader = new Shader(L"30_CubeSky.fx");
+	if (shader == nullptr)
+	{
+		this->shader = new Shader(L"30_CubeSky.fx");
+		bCreateShader = true;
+	}
 
-    sphere = new MeshRender(shader, new MeshSphere(0.5f));
-    sphere->AddTransform();
 
-    file = L"../../_Textures/" + file;
-    Check(D3DX11CreateShaderResourceViewFromFile(
-        D3D::GetDevice(), file.c_str(), nullptr, nullptr, &srv, nullptr
-    ));
+	sphereRender = new MeshRender(this->shader, new MeshSphere(0.5f));
+	sphereRender->AddTransform()->Scale(500, 500, 500);
 
-    sSrv = shader->AsSRV("SkyCubeMap");
+	wstring temp = L"../../_Textures/" + file;
+	Check(D3DX11CreateShaderResourceViewFromFile
+		(
+			D3D::GetDevice(), temp.c_str(), nullptr, nullptr, &srv, nullptr
+		));
+
+	sSrv = this->shader->AsSRV("SkyCubeMap");
 }
 
 CubeSky::~CubeSky()
 {
-    SafeDelete(shader);
-    SafeDelete(sphere);
+	if (bCreateShader == true)
+		SafeDelete(shader);
 
-    SafeRelease(srv);
+	SafeRelease(srv);
+	SafeDelete(sphereRender);
 }
 
 void CubeSky::Update()
 {
-    Vector3 position;
-    Context::Get()->GetCamera()->Position(&position);
-
-    sphere->GetTransform(0)->Position(position);
-    sphere->UpdateTransforms();
+	Vector3 position;
+	Context::Get()->GetCamera()->Position(&position);
+	sphereRender->GetTransform(0)->Position(position);
+	sphereRender->UpdateTransforms();
 }
 
 void CubeSky::Render()
 {
-    sSrv->SetResource(srv);
-    sphere->Render();
+	sSrv->SetResource(srv);
+
+	sphereRender->Pass(pass);
+	sphereRender->Render();
 }

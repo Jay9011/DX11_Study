@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Systems/Window.h"
 
+#include "DynamicCubeMapDemo.h"
 #include "BloomDemo.h"
 #include "GaussianBlurDemo2.h"
 #include "GaussianBlurDemo.h"
@@ -17,7 +18,8 @@
 
 void Main::Initialize()
 {
-	Push(new BloomDemo());
+	Push(new DynamicCubeMapDemo());
+	// Push(new BloomDemo());
 	// Push(new GaussianBlurDemo2());
 	// Push(new GaussianBlurDemo());
 	// Push(new BlurDemo());

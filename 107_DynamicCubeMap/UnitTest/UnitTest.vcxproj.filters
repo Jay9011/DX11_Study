@@ -138,6 +138,9 @@
     <ClCompile Include="BloomDemo.cpp">
       <Filter>PostEffects</Filter>
     </ClCompile>
+    <ClCompile Include="DynamicCubeMapDemo.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -276,6 +279,9 @@
     </ClInclude>
     <ClInclude Include="BloomDemo.h">
       <Filter>PostEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicCubeMapDemo.h">
+      <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

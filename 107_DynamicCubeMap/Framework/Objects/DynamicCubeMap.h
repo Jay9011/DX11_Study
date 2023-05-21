@@ -7,7 +7,7 @@ public:
 	~DynamicCubeMap();
 
 	void PreRender(Vector3& position, Vector3& scale, float zNear = 0.1f, float zFar = 500.0f, float fov = 0.5f);
-	void Type(UINT val) { desc.Type = val; }
+	UINT& Type() { return desc.Type; }
 
 	ID3D11ShaderResourceView* SRV() { return srv; }
 	Perspective* GetPerspective() { return perspective; }

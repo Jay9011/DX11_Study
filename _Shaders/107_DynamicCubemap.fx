@@ -159,7 +159,7 @@ void GS_PreRender(triangle MeshOutput input[3], inout TriangleStream<MeshGeometr
             output.Position = mul(float4(input[vertex].wPosition, 1), CubeViews[i]);
             output.Position = mul(output.Position, CubeProjection);
 
-            output.Position = input[vertex].oPosition;
+            output.oPosition = input[vertex].oPosition;
             output.wPosition = input[vertex].wPosition;
             output.Normal = input[vertex].Normal;
             output.Tangent = input[vertex].Tangent;
@@ -184,6 +184,28 @@ float4 PS_PreRender(MeshGeometryOutput input) : SV_Target
     return PS_AllLight(ConvetMeshOutput(input));
 }
 
+TextureCube DynamicCubeMap;
+
+float4 PS_CubeMap(MeshOutput input) : SV_Target
+{
+    float4 color = 0;
+    
+    float3 view = normalize(input.wPosition - ViewPosition());
+    float3 normal = normalize(input.Normal);
+    float3 reflection = reflect(view, normal);
+    
+    if(CubeRenderType == 0)
+    {
+        color = DynamicCubeMap.Sample(LinearSampler, input.oPosition);
+    }
+    else if (CubeRenderType == 1)
+    {
+        color = DynamicCubeMap.Sample(LinearSampler, reflection);
+    }
+    
+    return color;
+}
+
 technique11 T0
 {
     //Sky
@@ -198,9 +220,14 @@ technique11 T0
     P_BS_VGP(P4, AlphaBlend, VS, GS_Billboard, PS_Billboard)
     P_RS_BS_VGP(P5, CullMode_None, AlphaBlend_AlphaToCoverageEnable, VS, GS_Cross, PS_Billboard)
 
-    //Dynamic Cube Map PreRender
+    //Dynamic CubeMap PreRender
     P_RS_DSS_VGP(P6, FrontCounterClockwise_True, DepthEnable_False, VS_Mesh, GS_PreRender, PS_PreRender_Sky)
     P_VGP(P7, VS_Mesh, GS_PreRender, PS_PreRender)
     P_VGP(P8, VS_Model, GS_PreRender, PS_PreRender)
     P_VGP(P9, VS_Animation, GS_PreRender, PS_PreRender)
+
+    //Dynamic CubeMap Render
+    P_VP(P10, VS_Mesh, PS_CubeMap)
+    P_VP(P11, VS_Model, PS_CubeMap)
+    P_VP(P12, VS_Animation, PS_CubeMap)
 }
