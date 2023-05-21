@@ -15,7 +15,7 @@ public:
 private:
 	struct Desc
 	{
-		UINT Type;
+		UINT Type = 0;
 		float Padding[3];
 
 		Matrix Views[6];

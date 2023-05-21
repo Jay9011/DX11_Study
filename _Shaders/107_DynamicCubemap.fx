@@ -185,6 +185,12 @@ float4 PS_PreRender(MeshGeometryOutput input) : SV_Target
 }
 
 TextureCube DynamicCubeMap;
+float RefractionAmount = 0.2f;
+float RefractionAlpha = 0.75f;
+
+float CubeMapAmount = 1.0f;
+float CubeMapBias = 1.0f;
+float CubeMapScale = 1.0f;
 
 float4 PS_CubeMap(MeshOutput input) : SV_Target
 {
@@ -194,6 +200,10 @@ float4 PS_CubeMap(MeshOutput input) : SV_Target
     float3 normal = normalize(input.Normal);
     float3 reflection = reflect(view, normal);
     
+    float3 refraction = refract(view, normal, RefractionAmount);
+    
+    float4 diffuse = 0;
+    
     if(CubeRenderType == 0)
     {
         color = DynamicCubeMap.Sample(LinearSampler, input.oPosition);
@@ -201,6 +211,27 @@ float4 PS_CubeMap(MeshOutput input) : SV_Target
     else if (CubeRenderType == 1)
     {
         color = DynamicCubeMap.Sample(LinearSampler, reflection);
+    }
+    else if (CubeRenderType == 2)
+    {
+        color = DynamicCubeMap.Sample(LinearSampler, -refraction);
+        color.a = RefractionAlpha;
+    }
+    else if (CubeRenderType == 3)
+    {
+        diffuse = PS_AllLight(input);
+        color = DynamicCubeMap.Sample(LinearSampler, reflection);
+        
+        color.rgb *= (0.15f + diffuse * 0.95f);
+    }
+    else if (CubeRenderType == 4)
+    {
+        diffuse = PS_AllLight(input);
+        color = DynamicCubeMap.Sample(LinearSampler, reflection);
+        
+        float4 fresnel = CubeMapBias + (1.0f - CubeMapScale) * pow(abs(1.0f - dot(view, normal)), CubeMapAmount);
+        color = CubeMapAmount * diffuse + lerp(diffuse, color, fresnel);
+        color.a = 1.0f;
     }
     
     return color;
@@ -227,7 +258,7 @@ technique11 T0
     P_VGP(P9, VS_Animation, GS_PreRender, PS_PreRender)
 
     //Dynamic CubeMap Render
-    P_VP(P10, VS_Mesh, PS_CubeMap)
-    P_VP(P11, VS_Model, PS_CubeMap)
-    P_VP(P12, VS_Animation, PS_CubeMap)
+    P_BS_VP(P10, AlphaBlend, VS_Mesh, PS_CubeMap)
+    P_BS_VP(P11, AlphaBlend, VS_Model, PS_CubeMap)
+    P_BS_VP(P12, AlphaBlend, VS_Animation, PS_CubeMap)
 }

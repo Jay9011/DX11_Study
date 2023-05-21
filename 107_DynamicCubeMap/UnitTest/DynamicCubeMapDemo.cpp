@@ -45,7 +45,27 @@ void DynamicCubeMapDemo::Destroy()
 void DynamicCubeMapDemo::Update()
 {
 	ImGui::InputInt("CubeMap Type", (int*)&cubeMap->Type());
-	cubeMap->Type() %= 2;
+	cubeMap->Type() %= 5;
+
+	static float amount = 0.2f;
+	ImGui::SliderFloat("RefractionAmount", &amount, 0, 1);
+	shader->AsScalar("RefractionAmount")->SetFloat(amount);
+
+	static float alpha = 0.75f;
+	ImGui::SliderFloat("RefractionAlpha", &alpha, 0, 1);
+	shader->AsScalar("RefractionAlpha")->SetFloat(alpha);
+
+	static float CubeMapAmount = 0.75f;
+	ImGui::SliderFloat("CubeMapAmount", &CubeMapAmount, 0, 1);
+	shader->AsScalar("CubeMapAmount")->SetFloat(CubeMapAmount);
+
+	static float CubeMapBias = 0.75f;
+	ImGui::SliderFloat("CubeMapBias", &CubeMapBias, 0, 1);
+	shader->AsScalar("CubeMapBias")->SetFloat(CubeMapBias);
+
+	static float CubeMapScale = 0.75f;
+	ImGui::SliderFloat("CubeMapScale", &CubeMapScale, 0, 1);
+	shader->AsScalar("CubeMapScale")->SetFloat(CubeMapScale);
 
 	Vector3 position;
 	sphere2->GetTransform(0)->Position(&position);
