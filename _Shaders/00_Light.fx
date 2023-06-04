@@ -334,3 +334,47 @@ float4 PS_AllLight(MeshOutput input)
     
     return float4(MaterialToColor(result).rgb, 1.0f);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+///     
+///////////////////////////////////////////////////////////////////////////////
+
+Texture2D ProjectorMap;
+
+struct ProjectorDesc
+{
+    matrix View;
+    matrix Projection;
+    
+    float4 Color;
+};
+
+cbuffer CB_Projector
+{
+    ProjectorDesc Projector;
+};
+
+void VS_Projector(inout float4 wvp, float4 oPosition)
+{
+    wvp = WorldPosition(oPosition);
+    wvp = mul(wvp, Projector.View);
+    wvp = mul(wvp, Projector.Projection);
+}
+
+void PS_Projector(inout float4 color, float4 wvp)
+{
+    float3 uvw = 0;
+    
+    uvw.x = wvp.x / wvp.w * 0.5f + 0.5f;
+    uvw.y = -wvp.y / wvp.w * 0.5f + 0.5f;
+    uvw.z = wvp.z / wvp.w;
+
+    [flatten]
+    if (saturate(uvw.x) == uvw.x && saturate(uvw.y) == uvw.y && saturate(uvw.z) == uvw.z)
+    {
+        float4 map = ProjectorMap.Sample(LinearSampler, uvw.xy);
+        
+        map.rgb *= Projector.Color.rgb;
+        color = lerp(color, map, map.a);
+    }
+}
