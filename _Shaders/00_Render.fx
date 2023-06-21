@@ -3,8 +3,7 @@ float4 PS_Sky(MeshOutput input) : SV_Target
     return SkyCubeMap.Sample(LinearSampler, input.oPosition);
 }
 ///////////////////////////////////////////////////////////////////////////////
-///////////////           Mesh                             ////////////////////
-///////////////////////////////////////////////////////////////////////////////
+
 struct VertexMesh
 {
     float4 Position : Position;
@@ -19,23 +18,23 @@ struct VertexMesh
 ///////////////////////////////////////////////////////////////////////////////
 
 #define VS_GENERATE \
-output.oPosition = input.Position.xyz;\
+output.oPosition = input.Position.xyz; \
 \
-output.Position = WorldPosition(input.Position);\
-output.wPosition = output.Position.xyz;\
-output.Position = ViewProjection(output.Position);\
-output.wvpPosition = output.Position;\
-output.wvpPosition_Sub = output.Position;\
+output.Position = WorldPosition(input.Position); \
+output.wPosition = output.Position.xyz; \
+output.Position = ViewProjection(output.Position); \
+output.wvpPosition = output.Position; \
+output.wvpPosition_Sub = output.Position; \
 \
-output.sPosition = WorldPosition(input.Position);\
-output.sPosition = mul(output.sPosition, ShadowView);\
-output.sPosition = mul(output.sPosition, ShadowProjection);\
+output.sPosition = WorldPosition(input.Position); \
+output.sPosition = mul(output.sPosition, ShadowView); \
+output.sPosition = mul(output.sPosition, ShadowProjection); \
 \
-output.Normal = WorldNormal(input.Normal);\
-output.Tangent = WorldTangent(input.Tangent);\
+output.Normal = WorldNormal(input.Normal); \
+output.Tangent = WorldTangent(input.Tangent); \
 \
-output.Uv = input.Uv;\
-output.Color = input.Color;\
+output.Uv = input.Uv; \
+output.Color = input.Color;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -53,11 +52,11 @@ float4 PS_Depth(DepthOutput input) : SV_Target
 }
 
 #define VS_DEPTH_GENERATE \
-output.Position = WorldPosition(input.Position);\
-output.Position = mul(output.Position, ShadowView);\
-output.Position = mul(output.Position, ShadowProjection);\
+output.Position = WorldPosition(input.Position); \
+output.Position = mul(output.Position, ShadowView); \
+output.Position = mul(output.Position, ShadowProjection); \
 \
-output.Position = output.Position;\
+output.sPosition = output.Position;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -87,8 +86,6 @@ DepthOutput VS_Depth_Mesh(VertexMesh input)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-///////////////           Model                            ////////////////////
-///////////////////////////////////////////////////////////////////////////////
 
 struct VertexModel
 {
@@ -110,7 +107,6 @@ Texture2DArray TransformsMap;
 
 cbuffer CB_Bone
 {
-    // Bone 행렬이 Instance로 넘어오기에 Matrix 배열이 필요 없어졌습니다.
     //matrix BoneTransforms[MAX_MODEL_TRANSFORMS];
     
     uint BoneIndex;
@@ -118,13 +114,13 @@ cbuffer CB_Bone
 
 void SetModelWorld(inout matrix world, VertexModel input)
 {
-    // Texture로 보낸 Model 정보 배열에서 데이터를 매칭 해옵니다.
+    //world = mul(BoneTransforms[BoneIndex], world);
+    
     float4 m0 = TransformsMap.Load(int4(BoneIndex * 4 + 0, input.InstanceID, 0, 0));
     float4 m1 = TransformsMap.Load(int4(BoneIndex * 4 + 1, input.InstanceID, 0, 0));
     float4 m2 = TransformsMap.Load(int4(BoneIndex * 4 + 2, input.InstanceID, 0, 0));
     float4 m3 = TransformsMap.Load(int4(BoneIndex * 4 + 3, input.InstanceID, 0, 0));
     
-    // 가져온 데이터들로 World 데이터를 보내줍니다.
     matrix transform = matrix(m0, m1, m2, m3);
     world = mul(transform, input.Transform);
 }
@@ -149,8 +145,6 @@ DepthOutput VS_Depth_Model(VertexModel input)
     return output;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////           Animation                        ////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 #define MAX_MODEL_KEYFRAMES 500
@@ -220,7 +214,6 @@ void SetTweenWorld(inout matrix world, VertexModel input)
     [unroll(4)]
     for (int i = 0; i < 4; i++)
     {
-        // x가 나눠진 Bone, y가 KeyFrame, z가 Clip으로 들어옵니다.
         c0 = TransformsMap.Load(int4(indices[i] * 4 + 0, currFrame[0], clip[0], 0));
         c1 = TransformsMap.Load(int4(indices[i] * 4 + 1, currFrame[0], clip[0], 0));
         c2 = TransformsMap.Load(int4(indices[i] * 4 + 2, currFrame[0], clip[0], 0));
@@ -235,7 +228,7 @@ void SetTweenWorld(inout matrix world, VertexModel input)
         
         currAnim = lerp(curr, next, time[0]);
         
-        // 다음 clip 재생
+        
         [flatten]
         if (clip[1] > -1)
         {
@@ -255,6 +248,7 @@ void SetTweenWorld(inout matrix world, VertexModel input)
             
             currAnim = lerp(currAnim, nextAnim, TweenFrames[input.InstanceID].TweenTime);
         }
+        
         
         transform += mul(weights[i], currAnim);
     }
@@ -280,6 +274,7 @@ void SetBlendWorld(inout matrix world, VertexModel input)
 {
     float indices[4] = { input.BlendIndices.x, input.BlendIndices.y, input.BlendIndices.z, input.BlendIndices.w };
     float weights[4] = { input.BlendWeights.x, input.BlendWeights.y, input.BlendWeights.z, input.BlendWeights.w };
+    
     
     float4 c0, c1, c2, c3;
     float4 n0, n1, n2, n3;
@@ -312,25 +307,21 @@ void SetBlendWorld(inout matrix world, VertexModel input)
             currAnim[k] = lerp(curr, next, frame.Clip[k].Time);
         }
        
-        //Blending 강도 (0, 1, 2)
         int clipA = (int) frame.Alpha;
         int clipB = clipA + 1;
         
         float alpha = frame.Alpha;
         if (alpha >= 1.0f)
         {
-            // Blending 강도가 1보다 크면 Lerp에 사용하기 위해
-            // 1을 빼서 0 ~ 1로 Normalize 한다.
             alpha = frame.Alpha - 1.0f;
             
-            if (frame.Alpha >= 2.0f) //2보다 큰 경우에는 재생 구간이 1, 2 사이가 된다.
+            if (frame.Alpha >= 2.0f)
             {
                 clipA = 1;
                 clipB = 2;
             }
         }
         
-        // Blending 강도에 따라 Animation을 0 ~ 1로 Normalize 된 값으로 Lerp 시킨다.
         anim = lerp(currAnim[clipA], currAnim[clipB], alpha);
         
         transform += mul(weights[i], anim);

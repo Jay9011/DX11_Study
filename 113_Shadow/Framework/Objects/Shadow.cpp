@@ -2,7 +2,7 @@
 #include "Shadow.h"
 
 Shadow::Shadow(Shader* shader, Vector3& position, float radius, UINT width, UINT height)
-	: shader(shader), position(position), radius(radius), width(width), height(height)
+	: shader(shader), width(width), height(height), position(position), radius(radius)
 {
 	renderTarget = new RenderTarget(width, height);
 	depthStencil = new DepthStencil(width, height);
@@ -13,6 +13,23 @@ Shadow::Shadow(Shader* shader, Vector3& position, float radius, UINT width, UINT
 	buffer = new ConstantBuffer(&desc, sizeof(Desc));
 	sBuffer = shader->AsConstantBuffer("CB_Shadow");
 	sShadowMap = shader->AsSRV("ShadowMap");
+
+
+	//Create Sampler State
+	{
+		D3D11_SAMPLER_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_SAMPLER_DESC));
+		desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+		desc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.MaxAnisotropy = 1;
+		desc.MaxLOD = FLT_MAX;
+
+		Check(D3D::GetDevice()->CreateSamplerState(&desc, &pcfSampler));
+		sPcfSampler = shader->AsSampler("ShadowSampler");
+	}
 }
 
 Shadow::~Shadow()
@@ -26,6 +43,9 @@ Shadow::~Shadow()
 
 void Shadow::PreRender()
 {
+	ImGui::InputInt("Quality", (int*)&desc.Quality);
+	desc.Quality %= 3;
+
 	//1Pass
 	ImGui::SliderFloat3("Light Direction", Context::Get()->Direction(), -1, +1);
 	ImGui::SliderFloat("Bias", &desc.Bias, -0.0001f, +0.01f, "%.4f");
@@ -40,6 +60,7 @@ void Shadow::PreRender()
 	sBuffer->SetConstantBuffer(buffer->Buffer());
 
 	sShadowMap->SetResource(depthStencil->SRV());
+	sPcfSampler->SetSampler(0, pcfSampler);
 }
 
 void Shadow::CalcViewProjection()
@@ -55,13 +76,13 @@ void Shadow::CalcViewProjection()
 	D3DXVec3TransformCoord(&origin, &this->position, &desc.View);
 
 
-	float left = origin.x - radius;
-	float bottom = origin.y - radius;
-	float _near = origin.z - radius;
+	float l = origin.x - radius;
+	float b = origin.y - radius;
+	float n = origin.z - radius;
 
-	float right = origin.x + radius;
-	float top = origin.y + radius;
-	float _far = origin.z + radius;
+	float r = origin.x + radius;
+	float t = origin.y + radius;
+	float f = origin.z + radius;
 
-	D3DXMatrixOrthoLH(&desc.Projection, right - left, top - bottom, _near, _far);
+	D3DXMatrixOrthoLH(&desc.Projection, r - l, t - b, n, f);
 }

@@ -16,14 +16,11 @@ cbuffer CB_World
     matrix World;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-//////////     static const                                          //////////
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static const float PI = 3.14159265f;
 
-///////////////////////////////////////////////////////////////////////////////
-//////////     world, view, projection                               //////////
 ///////////////////////////////////////////////////////////////////////////////
 
 float4 WorldPosition(float4 position)
@@ -34,6 +31,9 @@ float4 WorldPosition(float4 position)
 float4 ViewProjection(float4 position)
 {
     return mul(position, VP);
+
+    //position = mul(position, View);
+    //return mul(position, Projection);
 }
 
 float3 WorldNormal(float3 normal)
@@ -51,8 +51,6 @@ float3 ViewPosition()
     return ViewInverse._41_42_43;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//////////       Vertex                                              //////////
 ///////////////////////////////////////////////////////////////////////////////
 
 struct Vertex
@@ -92,25 +90,22 @@ struct VertexTextureNormal
     float3 Normal : Normal;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 
 struct MeshOutput
 {
     float4 Position : SV_Position0; //Rasterizing Position
-    float3 oPosition : Position1;   //Original Position
-    float3 wPosition : Position2;   //World Position
+    float3 oPosition : Position1; //Original Position
+    float3 wPosition : Position2; //World Position
     float4 wvpPosition : Position3; //WVP
     float4 wvpPosition_Sub : Position4; //WVP
-    float4 sPosition : Position5;       //Light WVP
+    float4 sPosition : Position5; //Light WVP
     
     float3 Normal : Normal;
     float3 Tangent : Tangent;
     float2 Uv : Uv;
     float4 Color : Color;
 };
-
-///////////////////////////////////////////////////////////////////////////////
-//////////       MeshGeometryOutput                                  //////////
-///////////////////////////////////////////////////////////////////////////////
 
 struct MeshGeometryOutput
 {
@@ -141,8 +136,6 @@ MeshOutput ConvetMeshOutput(MeshGeometryOutput input)
     return output;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/////////  SamplerState,RasterizerState,DepthStencilState,BlendState  /////////
 ///////////////////////////////////////////////////////////////////////////////
 
 SamplerState LinearSampler
@@ -281,8 +274,10 @@ DepthStencilState DepthRead_Particle
     DepthFunc = Less_Equal;
     DepthWriteMask = 0;
 };
+
 ///////////////////////////////////////////////////////////////////////////////
-//////////       Defines                                             //////////
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Vertex / Pixel
 ///////////////////////////////////////////////////////////////////////////////

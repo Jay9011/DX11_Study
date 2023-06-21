@@ -12,11 +12,13 @@ cbuffer CB_Light
     LightDesc GlobalLight;
 };
 
+
 Texture2D DiffuseMap;
 Texture2D SpecularMap;
 Texture2D NormalMap;
 TextureCube SkyCubeMap;
 Texture2D ShadowMap;
+SamplerComparisonState ShadowSampler;
 
 struct MaterialDesc
 {
@@ -55,13 +57,12 @@ void AddMaterial(inout MaterialDesc result, MaterialDesc val)
     result.Emissive += val.Emissive;
 }
 
-
-/////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 void Texture(inout float4 color, Texture2D t, float2 uv, SamplerState samp)
 {
     float4 sampling = t.Sample(samp, uv);
-
+    
     color = color * sampling;
 }
 
@@ -70,15 +71,15 @@ void Texture(inout float4 color, Texture2D t, float2 uv)
     Texture(color, t, uv, LinearSampler);
 }
 
-/////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 void ComputeLight(out MaterialDesc output, float3 normal, float3 wPosition)
 {
     output = MakeMaterial();
-
+    
     float3 direction = -GlobalLight.Direction;
     float NdotL = dot(direction, normalize(normal));
-
+    
     output.Ambient = GlobalLight.Ambient * Material.Ambient;
     float3 E = normalize(ViewPosition() - wPosition);
 
@@ -86,13 +87,13 @@ void ComputeLight(out MaterialDesc output, float3 normal, float3 wPosition)
     if(NdotL > 0.0f)
     {
         output.Diffuse = Material.Diffuse * NdotL;
-
+        
         [flatten]
         if(Material.Specular.a > 0.0f)
         {
             float3 R = normalize(reflect(-direction, normal));
             float RdotE = saturate(dot(R, E));
-
+            
             float specular = pow(RdotE, Material.Specular.a);
             output.Specular = Material.Specular * specular * GlobalLight.Specular;
         }
@@ -117,10 +118,10 @@ struct PointLight
     float4 Diffuse;
     float4 Specular;
     float4 Emissive;
-
+    
     float3 Position;
     float Range;
-
+    
     float Intensity;
     float3 Padding;
 };
@@ -129,7 +130,7 @@ cbuffer CB_PointLights
 {
     uint PointLightCount;
     float3 CB_PointLights_Padding;
-
+    
     PointLight PointLights[MAX_POINT_LIGHTS];
 };
 
@@ -137,22 +138,22 @@ void ComputePointLight(inout MaterialDesc output, float3 normal, float3 wPositio
 {
     output = MakeMaterial();
     MaterialDesc result = MakeMaterial();
-    
+
     for (uint i = 0; i < PointLightCount; i++)
     {
         float3 light = PointLights[i].Position - wPosition;
         float dist = length(light);
-
+        
+        
         [flatten]
         if(dist > PointLights[i].Range)
             continue;
-
-        light /= dist;  // Normalize
-
-        // Global 대신 PointLight 에 대한 Ambient 를 계산합니다.
+        
+        
+        light /= dist; //Normalize
+        
         result.Ambient = PointLights[i].Ambient * Material.Ambient;
-
-        // Local Light 이기 때문에 각 정점에 대한 Light 의 방향으로 계산합니다.
+        
         float NdotL = dot(light, normalize(normal));
         float3 E = normalize(ViewPosition() - wPosition);
 
@@ -160,15 +161,15 @@ void ComputePointLight(inout MaterialDesc output, float3 normal, float3 wPositio
         if (NdotL > 0.0f)
         {
             result.Diffuse = Material.Diffuse * NdotL * PointLights[i].Diffuse;
-
+        
             [flatten]
             if (Material.Specular.a > 0.0f)
             {
                 float3 R = normalize(reflect(-light, normal));
                 float RdotE = saturate(dot(R, E));
-
+            
                 float specular = pow(RdotE, Material.Specular.a);
-                result.Specular = Material.Specular * specular * PointLights[i].Specular; // Global 대신 PointLight 에 대한 Specular 를 계산합니다.
+                result.Specular = Material.Specular * specular * PointLights[i].Specular;
             }
         }
     
@@ -180,20 +181,17 @@ void ComputePointLight(inout MaterialDesc output, float3 normal, float3 wPositio
         
             result.Emissive = Material.Emissive * emissive * PointLights[i].Emissive;
         }
-
+        
         float temp = 1.0f / saturate(dist / PointLights[i].Range);
         float att = temp * temp * (1.0f / max(1.0f - PointLights[i].Intensity, 1e-8f));
-
+        
         output.Ambient += result.Ambient * temp;
         output.Diffuse += result.Diffuse * att;
         output.Specular += result.Specular * att;
         output.Emissive += result.Emissive * att;
     }
-
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///     Spot Lighting
 ///////////////////////////////////////////////////////////////////////////////
 
 #define MAX_SPOT_LIGHTS 256
@@ -203,13 +201,13 @@ struct SpotLight
     float4 Diffuse;
     float4 Specular;
     float4 Emissive;
-
+    
     float3 Position;
     float Range;
-
+    
     float3 Direction;
     float Angle;
-
+    
     float Intensity;
     float3 Padding;
 };
@@ -218,7 +216,7 @@ cbuffer CB_SpotLights
 {
     uint SpotLightCount;
     float3 CB_SpotLights_Padding;
-
+    
     SpotLight SpotLights[MAX_SPOT_LIGHTS];
 };
 
@@ -226,21 +224,22 @@ void ComputeSpotLight(inout MaterialDesc output, float3 normal, float3 wPosition
 {
     output = MakeMaterial();
     MaterialDesc result = MakeMaterial();
-    
+
     for (uint i = 0; i < SpotLightCount; i++)
     {
         float3 light = SpotLights[i].Position - wPosition;
         float dist = length(light);
-
+        
+        
         [flatten]
-        if(dist > SpotLights[i].Range)
+        if (dist > SpotLights[i].Range)
             continue;
-
-        light /= dist;  // Normalize
+        
+        
+        light /= dist; //Normalize
         
         result.Ambient = SpotLights[i].Ambient * Material.Ambient;
-
-        // Local Light 이기 때문에 각 정점에 대한 Light 의 방향으로 계산합니다.
+        
         float NdotL = dot(light, normalize(normal));
         float3 E = normalize(ViewPosition() - wPosition);
 
@@ -248,13 +247,13 @@ void ComputeSpotLight(inout MaterialDesc output, float3 normal, float3 wPosition
         if (NdotL > 0.0f)
         {
             result.Diffuse = Material.Diffuse * NdotL * SpotLights[i].Diffuse;
-
+        
             [flatten]
             if (Material.Specular.a > 0.0f)
             {
                 float3 R = normalize(reflect(-light, normal));
                 float RdotE = saturate(dot(R, E));
-
+            
                 float specular = pow(RdotE, Material.Specular.a);
                 result.Specular = Material.Specular * specular * SpotLights[i].Specular;
             }
@@ -268,40 +267,41 @@ void ComputeSpotLight(inout MaterialDesc output, float3 normal, float3 wPosition
         
             result.Emissive = Material.Emissive * emissive * SpotLights[i].Emissive;
         }
-
+        
+        
         float temp = pow(saturate(dot(-light, SpotLights[i].Direction)), SpotLights[i].Angle);
         float att = temp * (1.0f / max(1.0f - SpotLights[i].Intensity, 1e-8f));
-
+        
         output.Ambient += result.Ambient * temp;
         output.Diffuse += result.Diffuse * att;
         output.Specular += result.Specular * att;
         output.Emissive += result.Emissive * att;
     }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-///     Normal Mapping
-///////////////////////////////////////////////////////////////////////////////
+
 void NormalMapping(float2 uv, float3 normal, float3 tangent, SamplerState samp)
 {
     float4 map = NormalMap.Sample(samp, uv);
-
+    
     [flatten]
     if (any(map.rgb) == false)
         return;
 
-    float3 coord = map.rgb * 2.0f - 1.0f; // 0~1 까지의 값을 -1~1 까지의 값으로 변환
-
-    // Tangent 공간 생성
-    float3 N = normalize(normal); // Z 축
-    float3 T = normalize(tangent - dot(tangent, N) * N); // X 축
-    float3 B = cross(N, T);         // Y 축
+    
+    float3 coord = map.rgb * 2.0f - 1.0f; //-1 ~ +1
+    
+    
+    //탄젠트 공간
+    float3 N = normalize(normal); //Z
+    float3 T = normalize(tangent - dot(tangent, N) * N); //X
+    float3 B = cross(N, T); //Y
     
     float3x3 TBN = float3x3(T, B, N);
     
     coord = mul(coord, TBN);
-
+    
     Material.Diffuse *= saturate(dot(-GlobalLight.Direction, coord));
 }
 
@@ -310,8 +310,6 @@ void NormalMapping(float2 uv, float3 normal, float3 tangent)
     NormalMapping(uv, normal, tangent, LinearSampler);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///     
 ///////////////////////////////////////////////////////////////////////////////
 
 float4 PS_AllLight(MeshOutput input)
@@ -336,8 +334,6 @@ float4 PS_AllLight(MeshOutput input)
     return float4(MaterialToColor(result).rgb, 1.0f);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///     
 ///////////////////////////////////////////////////////////////////////////////
 
 Texture2D ProjectorMap;
@@ -381,8 +377,6 @@ void PS_Projector(inout float4 color, float4 wvp)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-///     
-///////////////////////////////////////////////////////////////////////////////
 
 cbuffer CB_Shadow
 {
@@ -394,3 +388,4 @@ cbuffer CB_Shadow
     
     uint ShadowQuality;
 };
+

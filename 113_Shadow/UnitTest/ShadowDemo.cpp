@@ -9,9 +9,9 @@ void ShadowDemo::Initialize()
 
     shader = new Shader(L"113_Shadow.fx");
 
-	shadow = new Shadow(shader, Vector3(0, 0, 0), 65);
+	UINT size = 1024;// * 8; * 16;
+	shadow = new Shadow(shader, Vector3(0, 0, 0), 65, size, size);
 
-	render2D = new Render2D();
 	render2D = new Render2D();
 	//render2D->GetTransform()->Position(D3D::Width() * 0.5f, D3D::Height() * 0.5f, 0);
 	//render2D->GetTransform()->Scale(D3D::Width(), D3D::Height(), 1);
@@ -24,6 +24,7 @@ void ShadowDemo::Initialize()
 	
 	Mesh();
 	Airplane();
+
 	Kachujin();
 	KachujinCollider();
 	KachujinWeapon();
@@ -67,6 +68,7 @@ void ShadowDemo::Update()
 		kachujin->GetAttachTransform(i, worlds);
 		weapon->GetTransform(i)->World(weaponInitTransform->World() * worlds[40]);
 	}
+
 	weapon->UpdateTransforms();
 	weapon->Update();
 
