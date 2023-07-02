@@ -42,4 +42,5 @@ private:
 
 	ID3D11SamplerState* pcfSampler;
 	ID3DX11EffectSamplerVariable* sPcfSampler;
+
 };
